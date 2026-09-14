@@ -1,0 +1,132 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f4f5f7;
+    color: #1f2430;
+}
+
+.card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+}
+
+h1 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+}
+
+.progress {
+    margin: 0 0 24px;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.question-text {
+    margin: 0 0 20px;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.answers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.answer-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: 1px solid #e0e2e8;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.answer-option:hover {
+    border-color: #a5b4fc;
+    background: #f5f6ff;
+}
+
+.answer-option input {
+    accent-color: #4f46e5;
+}
+
+.answer-option.selected {
+    border-color: #4f46e5;
+    background: #eef0ff;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    background: #4f46e5;
+    color: #ffffff;
+    width: 100%;
+}
+
+button:disabled {
+    background: #c7c9d9;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background: #4338ca;
+}
+
+.result-score {
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+}
+
+.result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.result-item {
+    border: 1px solid #e0e2e8;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.result-item .question-text {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.result-answer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 0.95rem;
+}
+
+.result-answer.correct {
+    color: #15803d;
+}
+
+.result-answer.incorrect {
+    color: #b91c1c;
+}
