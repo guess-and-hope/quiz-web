@@ -1,0 +1,72 @@
+{
+  "id": "geografia",
+  "title": "Geografia świata",
+  "description": "Sprawdź swoją wiedzę o kontynentach, stolicach, górach i rzekach.",
+  "category": "Geografia",
+  "createdAt": "2026-09-15T00:00:00.000Z",
+  "updatedAt": "2026-09-15T00:00:00.000Z",
+  "questions": [
+    {
+      "id": "geo-1",
+      "type": "single",
+      "text": "Jaka jest stolica Australii?",
+      "options": ["Sydney", "Canberra", "Melbourne", "Perth"],
+      "correct": 1,
+      "explanation": "Canberra została zaprojektowana jako stolica jako kompromis między Sydney a Melbourne."
+    },
+    {
+      "id": "geo-2",
+      "type": "single",
+      "text": "Która rzeka jest najdłuższa na świecie?",
+      "options": ["Amazonka", "Nil", "Jangcy", "Mississippi"],
+      "correct": 1,
+      "explanation": "Nil ma długość ok. 6650 km, choć niektóre pomiary wskazują Amazonkę jako dłuższą."
+    },
+    {
+      "id": "geo-3",
+      "type": "boolean",
+      "text": "Rosja leży zarówno w Europie, jak i w Azji.",
+      "correct": true,
+      "explanation": "Granica między Europą a Azją w Rosji przebiega wzdłuż Gór Uralskich."
+    },
+    {
+      "id": "geo-4",
+      "type": "multi",
+      "text": "Które z poniższych państw leżą w Ameryce Południowej?",
+      "options": ["Brazylia", "Meksyk", "Peru", "Kolumbia", "Panama"],
+      "correct": [0, 2, 3],
+      "explanation": "Meksyk i Panama należą do Ameryki Północnej (Panama do Ameryki Środkowej)."
+    },
+    {
+      "id": "geo-5",
+      "type": "single",
+      "text": "Jaki jest najwyższy szczyt świata?",
+      "options": ["K2", "Mount Everest", "Kanczendzonga", "Lhotse"],
+      "correct": 1,
+      "explanation": "Mount Everest osiąga wysokość 8848,86 m n.p.m."
+    },
+    {
+      "id": "geo-6",
+      "type": "boolean",
+      "text": "Sahara jest największą pustynią świata.",
+      "correct": false,
+      "explanation": "Sahara jest największą pustynią gorącą, ale największą pustynią na świecie jest Antarktyda (pustynia lodowa)."
+    },
+    {
+      "id": "geo-7",
+      "type": "single",
+      "text": "Nad jakim morzem leży Gdańsk?",
+      "options": ["Morze Śródziemne", "Morze Czarne", "Morze Bałtyckie", "Morze Północne"],
+      "correct": 2,
+      "explanation": "Gdańsk leży nad Zatoką Gdańską, częścią Morza Bałtyckiego."
+    },
+    {
+      "id": "geo-8",
+      "type": "multi",
+      "text": "Które kraje graniczą z Polską?",
+      "options": ["Niemcy", "Węgry", "Czechy", "Ukraina", "Francja"],
+      "correct": [0, 2, 3],
+      "explanation": "Polska graniczy z 7 państwami; Węgry i Francja nie leżą przy jej granicy."
+    }
+  ]
+}

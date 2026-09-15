@@ -1,0 +1,78 @@
+{
+  "id": "historia",
+  "title": "Historia powszechna",
+  "description": "Pytania o ważne wydarzenia, postacie i daty z historii świata i Polski.",
+  "category": "Historia",
+  "createdAt": "2026-09-15T00:00:00.000Z",
+  "updatedAt": "2026-09-15T00:00:00.000Z",
+  "questions": [
+    {
+      "id": "hist-1",
+      "type": "single",
+      "text": "W którym roku wybuchła II wojna światowa?",
+      "options": ["1937", "1939", "1941", "1945"],
+      "correct": 1,
+      "explanation": "II wojna światowa rozpoczęła się 1 września 1939 roku napaścią Niemiec na Polskę."
+    },
+    {
+      "id": "hist-2",
+      "type": "boolean",
+      "text": "Mikołaj Kopernik był autorem dzieła \"O obrotach sfer niebieskich\".",
+      "correct": true,
+      "explanation": "Dzieło to zostało wydane w 1543 roku i przedstawiało heliocentryczną teorię budowy Układu Słonecznego."
+    },
+    {
+      "id": "hist-3",
+      "type": "single",
+      "text": "Kto był pierwszym cesarzem Rzymu?",
+      "options": ["Juliusz Cezar", "Oktawian August", "Neron", "Trajan"],
+      "correct": 1,
+      "explanation": "Oktawian August został pierwszym cesarzem rzymskim w 27 roku p.n.e."
+    },
+    {
+      "id": "hist-4",
+      "type": "multi",
+      "text": "Które z poniższych wydarzeń miały miejsce w XX wieku?",
+      "options": [
+        "Rewolucja francuska",
+        "Upadek muru berlińskiego",
+        "Odkrycie Ameryki",
+        "Pierwsza wojna światowa",
+        "Lot na Księżyc"
+      ],
+      "correct": [1, 3, 4],
+      "explanation": "Rewolucja francuska (1789) i odkrycie Ameryki (1492) miały miejsce przed XX wiekiem."
+    },
+    {
+      "id": "hist-5",
+      "type": "single",
+      "text": "W którym roku Polska odzyskała niepodległość po zaborach?",
+      "options": ["1905", "1918", "1920", "1939"],
+      "correct": 1,
+      "explanation": "Polska odzyskała niepodległość 11 listopada 1918 roku."
+    },
+    {
+      "id": "hist-6",
+      "type": "boolean",
+      "text": "Mur berliński upadł w 1989 roku.",
+      "correct": true,
+      "explanation": "Mur berliński upadł 9 listopada 1989 roku, symbolicznie kończąc podział Niemiec."
+    },
+    {
+      "id": "hist-7",
+      "type": "single",
+      "text": "Kto dowodził wyprawą, która jako pierwsza opłynęła kulę ziemską?",
+      "options": ["Krzysztof Kolumb", "Ferdynand Magellan", "Vasco da Gama", "James Cook"],
+      "correct": 1,
+      "explanation": "Wyprawa Magellana rozpoczęła się w 1519 roku; sam odkrywca zginął po drodze, a wyprawę dokończył Juan Sebastián Elcano."
+    },
+    {
+      "id": "hist-8",
+      "type": "multi",
+      "text": "Które państwa należały do aliantów podczas II wojny światowej?",
+      "options": ["Wielka Brytania", "Włochy", "ZSRR", "Stany Zjednoczone", "Japonia"],
+      "correct": [0, 2, 3],
+      "explanation": "Włochy i Japonia należały do państw Osi, przeciwnika aliantów."
+    }
+  ]
+}
