@@ -5,7 +5,7 @@ import { SingleChoiceQuestion } from '../../models';
 const singleQuestion: SingleChoiceQuestion = {
   id: 'q1',
   type: 'single',
-  text: 'Pytanie testowe?',
+  text: 'Test question?',
   options: ['A', 'B', 'C'],
   correct: 1,
 };
