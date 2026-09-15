@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
+import { AttemptService } from '../../services/attempt.service';
 import { QuizQuestion } from '../../components/quiz-question/quiz-question';
 import { AnswerValue } from '../../models';
 
@@ -14,6 +15,7 @@ export class QuizPlay {
   readonly id = input.required<string>();
 
   private readonly quizService = inject(QuizService);
+  private readonly attemptService = inject(AttemptService);
   private readonly router = inject(Router);
 
   private readonly quizzes = this.quizService.getAll();
@@ -59,6 +61,7 @@ export class QuizPlay {
   }
 
   protected finish(): void {
+    this.attemptService.submit(this.id(), this.answers());
     this.router.navigate(['/quiz', this.id(), 'result']);
   }
 }
