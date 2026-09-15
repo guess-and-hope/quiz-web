@@ -8,29 +8,29 @@ Bez BaaS, bez kont użytkowników, bez rankingów globalnych i pozostałych przy
 ## 1. Cel etapu
 
 Działająca aplikacja quizowa po stronie przeglądarki, w której użytkownik może:
-rozwiązać quiz, dostać punkty, zobaczyć które odpowiedzi były poprawne oraz
-samodzielnie dodawać, edytować i usuwać quizy. Dane trzymane lokalnie (JSON + `localStorage`).
+rozwiązać quiz, dostać punkty oraz zobaczyć, które odpowiedzi były poprawne.
+Dane (quizy) trzymane w repozytorium jako pliki JSON — tylko do odczytu.
 
 ## 2. Stack technologiczny
 
 - **Angular** (najnowsza stabilna wersja, standalone components, sygnały do stanu)
 - **TypeScript** — modele danych jako interfejsy/typy
 - **Angular Router** — nawigacja między ekranami
-- **Reactive Forms** — formularz dodawania/edycji quizu
 - **CSS/SCSS** (lub Angular Material — do decyzji przy implementacji)
-- **Brak backendu** — dane: pliki JSON w repo + `localStorage`
+- **Brak backendu** — dane: pliki JSON w repo (tylko do odczytu)
 
 ## 3. Zakres — w skrócie
 
 **Wchodzi do Etapu 1:**
-- Lista quizów z wyszukiwarką/filtrowaniem
+- Lista quizów
 - Rozwiązywanie quizu (kilka typów pytań)
 - Punktacja i ekran wyniku
 - Podgląd poprawnych odpowiedzi + wyjaśnienia
-- Dodawanie, edycja i usuwanie quizu (z walidacją)
-- Import/eksport quizu jako plik JSON
 
 **NIE wchodzi (patrz sekcja 12):**
+- Dodawanie, edycja i usuwanie quizu (z walidacją)
+- Import/eksport quizu jako plik JSON
+- Zapis quizów użytkownika w `localStorage`
 - Konta użytkowników, logowanie
 - Globalny ranking, grywalizacja (odznaki, streak)
 - Synchronizacja między urządzeniami, BaaS/backend
@@ -79,32 +79,27 @@ interface Quiz {
 }
 ```
 
-Ten sam typ opisuje: plik JSON w repo, formularz dodawania oraz logikę punktacji
-(jedno źródło prawdy).
+Ten sam typ opisuje plik JSON w repo oraz logikę punktacji (jedno źródło prawdy).
 
 ## 5. Przechowywanie danych
 
-- **Startowa biblioteka quizów** — pliki JSON w repo, np. `src/assets/quizzes/*.json`
+- **Biblioteka quizów** — pliki JSON w repo, np. `src/assets/quizzes/*.json`
   (wczytywane przy starcie, tylko do odczytu).
-- **Quizy użytkownika** — zapisywane w `localStorage` (dodane, zedytowane, usunięte).
 - **Wyniki rozwiązania** — liczone w pamięci na czas sesji rozgrywki
-  (bez trwałej historii — to Etap 2).
+  (bez trwałej historii — to kolejny etap).
 - Warstwa dostępu do danych ukryta za serwisem (np. `QuizService`), aby w przyszłości
-  podmienić `localStorage` na API bez zmiany komponentów.
+  podmienić źródło danych (pliki JSON) na `localStorage`/API bez zmiany komponentów.
 
 ## 6. Funkcjonalności (szczegółowo)
 
 ### 6.1 Lista quizów
-- Wyświetla wszystkie quizy (z repo + z `localStorage`).
-- Dla każdego: tytuł, kategoria, liczba pytań, przyciski „Rozwiąż" / „Edytuj" / „Usuń".
-- Pole wyszukiwania po tytule oraz opcjonalny filtr po kategorii.
-- Przycisk „Dodaj quiz" oraz „Importuj z pliku".
+- Wyświetla wszystkie quizy wczytane z plików JSON w repo.
+- Dla każdego: tytuł, kategoria, liczba pytań, przycisk „Rozwiąż".
 
 ### 6.2 Rozwiązywanie quizu
-- Pytania prezentowane pojedynczo lub jako lista (do decyzji — domyślnie pojedynczo).
+- Pytania prezentowane pojedynczo (jedno pytanie na ekran).
 - Obsługa typów: jednokrotny wybór, wielokrotny wybór, prawda/fałsz.
 - Nawigacja: dalej / wstecz, wskaźnik postępu (np. „3 / 10").
-- Opcjonalne mieszanie kolejności pytań i odpowiedzi.
 - Przycisk „Zakończ i sprawdź" na końcu.
 - Odpowiedzi użytkownika trzymane w stanie do momentu policzenia wyniku.
 
@@ -121,24 +116,6 @@ Ten sam typ opisuje: plik JSON w repo, formularz dodawania oraz logikę punktacj
 - Wyświetlenie wyjaśnienia (`explanation`), jeśli istnieje.
 - Akcje: „Rozwiąż ponownie", „Wróć do listy".
 
-### 6.5 Dodawanie quizu
-- Formularz (Reactive Forms): tytuł, opis, kategoria.
-- Dynamiczne dodawanie/usuwanie pytań.
-- Dla każdego pytania: wybór typu, treść, opcje odpowiedzi, wskazanie poprawnej,
-  opcjonalne wyjaśnienie.
-- Zapis do `localStorage`.
-
-### 6.6 Edycja / usuwanie quizu
-- Edycja: ten sam formularz co dodawanie, wypełniony danymi quizu.
-- Usuwanie: z potwierdzeniem.
-- Uwaga: quizy startowe z repo są tylko do odczytu (edycja tworzy kopię w `localStorage`
-  — do decyzji przy implementacji; domyślnie: edytowalne tylko quizy użytkownika).
-
-### 6.7 Import / eksport JSON
-- **Eksport**: pobranie wybranego quizu jako plik `.json`.
-- **Import**: wczytanie pliku `.json`, walidacja zgodności ze schematem, zapis do `localStorage`.
-- To zastępuje „współdzielenie" quizów bez backendu.
-
 ## 7. Typy pytań (Etap 1)
 
 | Typ | Opis | Odpowiedź |
@@ -147,7 +124,7 @@ Ten sam typ opisuje: plik JSON w repo, formularz dodawania oraz logikę punktacj
 | `multi` | Wielokrotny wybór | zbiór indeksów |
 | `boolean` | Prawda / fałsz | wartość logiczna |
 
-(Pytania otwarte / wpisywane — poza Etapem 1, ewentualnie Etap 2.)
+(Pytania otwarte / wpisywane — poza Etapem 1, ewentualnie kolejny etap.)
 
 ## 8. Ekrany i routing
 
@@ -156,52 +133,92 @@ Ten sam typ opisuje: plik JSON w repo, formularz dodawania oraz logikę punktacj
 | `/` lub `/quizzes` | Lista quizów |
 | `/quiz/:id` | Rozwiązywanie quizu |
 | `/quiz/:id/result` | Ekran wyniku |
-| `/create` | Dodawanie quizu |
-| `/quiz/:id/edit` | Edycja quizu |
 | `**` | Strona 404 / przekierowanie na listę |
 
 ## 9. Architektura Angular (propozycja)
 
 - **Komponenty**: `QuizListComponent`, `QuizPlayComponent`, `QuizResultComponent`,
-  `QuizFormComponent` (współdzielony dla dodawania/edycji), `QuestionComponent`.
-- **Serwisy**: `QuizService` (CRUD + wczytywanie JSON), `StorageService`
-  (opakowanie `localStorage`), `ScoringService` (logika punktacji).
+  `QuestionComponent`.
+- **Serwisy**: `QuizService` (wczytywanie quizów z JSON), `ScoringService`
+  (logika punktacji).
 - **Modele**: interfejsy z sekcji 4 w osobnym pliku `models/`.
 - **Stan**: sygnały (signals) w serwisach; komponenty subskrybują.
 
-## 10. Walidacja
+## 10. Etapy implementacji
 
-**Formularz quizu:**
-- Tytuł wymagany (min. długość, np. 3 znaki).
-- Min. 1 pytanie w quizie.
-- Każde pytanie: niepusta treść.
-- `single`/`multi`: min. 2 opcje, brak pustych opcji.
-- `single`: dokładnie jedna poprawna; `multi`: min. jedna poprawna; `boolean`: wybrana wartość.
+Kolejne, przyrostowe kroki. Po każdym aplikacja powinna się kompilować i uruchamiać.
 
-**Import JSON:**
-- Sprawdzenie zgodności ze schematem; przy błędzie — czytelny komunikat, brak zapisu.
+### Krok 0 — Szkielet projektu
+- Konfiguracja routingu (`app.routes.ts`) i struktury folderów: `models/`, `services/`,
+  `components/` (lub `features/`).
+- Podstawowy layout (nagłówek + `router-outlet`).
+- **Ukończone, gdy:** `ng serve` startuje, widoczna pusta strona z routingiem.
+
+### Krok 1 — Modele i dane
+- Interfejsy TS z sekcji 4 w `models/`.
+- 2–3 przykładowe quizy jako pliki JSON w `src/assets/quizzes/`
+  (różne typy pytań, w tym `explanation`).
+- `QuizService`: wczytanie quizów z JSON (`HttpClient`/`fetch`), udostępnienie
+  jako sygnały; metody `getAll()` i `getById(id)`.
+- **Ukończone, gdy:** serwis zwraca listę quizów wczytaną z plików.
+
+### Krok 2 — Lista quizów
+- `QuizListComponent` na trasie `/` (`/quizzes`).
+- Karta/wiersz na quiz: tytuł, kategoria, liczba pytań, przycisk „Rozwiąż".
+- **Ukończone, gdy:** lista renderuje quizy z `QuizService`, „Rozwiąż" nawiguje
+  do `/quiz/:id`.
+
+### Krok 3 — Rozwiązywanie quizu
+- `QuizPlayComponent` na trasie `/quiz/:id` + `QuestionComponent` na pojedyncze pytanie.
+- Obsługa typów `single` / `multi` / `boolean`, nawigacja dalej/wstecz, wskaźnik
+  postępu, stan odpowiedzi w sygnałach.
+- Przycisk „Zakończ i sprawdź".
+- **Ukończone, gdy:** można przejść cały quiz i zebrać odpowiedzi w stanie.
+
+### Krok 4 — Punktacja
+- `ScoringService`: 1 pkt za pytanie, dla `multi` pełna zgodność zbiorów; wynik jako
+  liczba punktów i procent.
+- **Ukończone, gdy:** po „Zakończ i sprawdź" liczony jest poprawny wynik (testy
+  jednostkowe reguł punktacji).
+
+### Krok 5 — Ekran wyniku
+- `QuizResultComponent` na trasie `/quiz/:id/result`.
+- Podsumowanie (punkty, procent), lista pytań z porównaniem odpowiedzi (kolor
+  poprawne/błędne), wyjaśnienia; akcje „Rozwiąż ponownie" / „Wróć do listy".
+- **Ukończone, gdy:** ekran wyniku pokazuje pełny przegląd rozwiązania.
+
+### Krok 6 — Dopracowanie
+- Trasa `**` → 404 / przekierowanie na listę.
+- Stany brzegowe (brak quizów, błąd wczytania JSON, nieznane `:id`).
+- Style/porządki, podstawowa responsywność.
+- **Ukończone, gdy:** spełnione wszystkie kryteria akceptacji (sekcja 11).
 
 ## 11. Kryteria akceptacji
 
-- [ ] Użytkownik widzi listę quizów i może ją przeszukać.
+- [ ] Użytkownik widzi listę quizów.
 - [ ] Użytkownik rozwiązuje quiz z pytaniami różnych typów.
 - [ ] Po zakończeniu widzi wynik (punkty + procent).
 - [ ] Ekran wyniku pokazuje poprawne odpowiedzi i wyjaśnienia.
-- [ ] Użytkownik może dodać nowy quiz przez formularz (z walidacją).
-- [ ] Użytkownik może edytować i usunąć własny quiz.
-- [ ] Quizy przetrwają odświeżenie strony (`localStorage`).
-- [ ] Użytkownik może wyeksportować i zaimportować quiz jako JSON.
 - [ ] Aplikacja działa jako statyczna strona bez backendu.
 
-## 12. Poza zakresem Etapu 1 (przyszłość)
+## 12. Poza zakresem Etapu 1 (następne kroki)
 
+**Najbliższe kroki (przeniesione z Etapu 1):**
+- Dodawanie, edycja i usuwanie quizu — formularz (Reactive Forms) z walidacją
+  (tytuł wymagany, min. 1 pytanie, poprawne opcje i wskazanie poprawnych odpowiedzi).
+- Import/eksport quizu jako plik JSON (walidacja zgodności ze schematem przy imporcie).
+- Zapis quizów użytkownika w `localStorage` (dodane/zedytowane), przetrwanie odświeżenia.
+
+**Dalsza przyszłość:**
 - Konta użytkowników, logowanie, autoryzacja
 - Backend / BaaS (Firebase, Supabase), wspólna baza danych
 - Globalny ranking, leaderboard, tryb pojedynku
 - Grywalizacja: odznaki, passa (streak), poziomy
 - Trwała historia podejść i śledzenie postępów
 - Synchronizacja między urządzeniami
-- Timer z limitem czasu (opcjonalnie do rozważenia już w E1)
+- Timer z limitem czasu
+- Wyszukiwanie i filtrowanie listy quizów (po tytule / kategorii)
+- Mieszanie (losowa kolejność) pytań i odpowiedzi
 - Pytania otwarte / wpisywane, pytania z obrazkami
 - Tryb ciemny, wielojęzyczność, dostępność (a11y) na poziomie zaawansowanym
 - Moderacja treści, quizy publiczne/prywatne
