@@ -37,6 +37,9 @@ export class QuizPlay {
   protected readonly progressText = computed(() =>
     this.questions().length ? `${this.currentIndex() + 1} / ${this.questions().length}` : '',
   );
+  protected readonly progressSegments = computed(() =>
+    Array.from({ length: this.questions().length }, (_, index) => index <= this.currentIndex()),
+  );
   protected readonly isFirst = computed(() => this.currentIndex() === 0);
   protected readonly isLast = computed(() => this.currentIndex() === this.questions().length - 1);
 

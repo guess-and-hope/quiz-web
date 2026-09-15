@@ -1,5 +1,5 @@
-<fieldset class="quiz-question">
-  <legend class="quiz-question__text">{{ question().text }}</legend>
+<div class="quiz-question" role="group" [attr.aria-label]="question().text">
+  <p class="quiz-question__text">{{ question().text }}</p>
 
   @switch (question().type) {
     @case ('single') {
@@ -58,4 +58,4 @@
       </div>
     }
   }
-</fieldset>
+</div>
