@@ -24,7 +24,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -- --base-href=/quiz-web/
       - name: SPA fallback (404) + disable Jekyll
         run: |
           cp dist/quiz-web/browser/index.html dist/quiz-web/browser/404.html
