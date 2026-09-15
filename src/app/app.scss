@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.app-header {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+
+.app-main {
+  padding-block: 1.5rem;
+}

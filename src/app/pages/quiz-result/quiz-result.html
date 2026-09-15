@@ -1,0 +1,48 @@
+@if (loading()) {
+  <p class="status">Wczytywanie quizu…</p>
+} @else if (error()) {
+  <p class="status status--error">{{ error() }}</p>
+} @else if (quiz(); as quiz) {
+  @if (!hasAttempt()) {
+    <div class="status">
+      <p>Nie masz jeszcze wyniku dla tego quizu.</p>
+      <a [routerLink]="['/quiz', quiz.id]">Rozwiąż quiz</a>
+    </div>
+  } @else if (score(); as score) {
+    <div class="quiz-result">
+      <header class="quiz-result__header">
+        <h2>{{ quiz.title }} — wynik</h2>
+        <p class="quiz-result__score">
+          {{ score.correct }} / {{ score.total }} — {{ score.percentage }}%
+        </p>
+      </header>
+
+      <ol class="quiz-result__list">
+        @for (review of reviews(); track review.question.id) {
+          <li
+            class="quiz-result__item"
+            [class.quiz-result__item--correct]="review.isCorrect"
+            [class.quiz-result__item--wrong]="!review.isCorrect"
+          >
+            <p class="quiz-result__question">{{ review.question.text }}</p>
+            <p class="quiz-result__answer">Twoja odpowiedź: {{ review.userAnswerText }}</p>
+            @if (!review.isCorrect) {
+              <p class="quiz-result__answer">Poprawna odpowiedź: {{ review.correctAnswerText }}</p>
+            }
+            @if (review.question.explanation) {
+              <p class="quiz-result__explanation">{{ review.question.explanation }}</p>
+            }
+          </li>
+        }
+      </ol>
+
+      <div class="quiz-result__actions">
+        <a [routerLink]="['/quiz', quiz.id]">Rozwiąż ponownie</a>
+        <a routerLink="/quizzes">Wróć do listy</a>
+      </div>
+    </div>
+  }
+} @else {
+  <p class="status">Nie znaleziono quizu.</p>
+  <a routerLink="/quizzes">Wróć do listy</a>
+}

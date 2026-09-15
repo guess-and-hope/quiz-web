@@ -1,0 +1,28 @@
+<section class="quiz-list">
+  <h2>Dostępne quizy</h2>
+
+  @if (loading()) {
+    <p class="quiz-list__status">Wczytywanie quizów…</p>
+  } @else if (error()) {
+    <p class="quiz-list__status quiz-list__status--error">{{ error() }}</p>
+  } @else if (quizzes().length === 0) {
+    <p class="quiz-list__status">Brak dostępnych quizów.</p>
+  } @else {
+    <ul class="quiz-cards">
+      @for (quiz of quizzes(); track quiz.id) {
+        <li class="quiz-card">
+          <div class="quiz-card__info">
+            <h3>{{ quiz.title }}</h3>
+            @if (quiz.category) {
+              <span class="quiz-card__category">{{ quiz.category }}</span>
+            }
+            <p class="quiz-card__count">{{ quiz.questions.length }} pytań</p>
+          </div>
+          <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">
+            Rozwiąż
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>

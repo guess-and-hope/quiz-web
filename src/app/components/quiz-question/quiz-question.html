@@ -1,0 +1,61 @@
+<fieldset class="quiz-question">
+  <legend class="quiz-question__text">{{ question().text }}</legend>
+
+  @switch (question().type) {
+    @case ('single') {
+      <ul class="quiz-question__options">
+        @for (option of options(); track $index) {
+          <li>
+            <label class="quiz-question__option">
+              <input
+                type="radio"
+                [name]="question().id"
+                [checked]="isSingleSelected($index)"
+                (change)="selectSingle($index)"
+              />
+              {{ option }}
+            </label>
+          </li>
+        }
+      </ul>
+    }
+    @case ('multi') {
+      <ul class="quiz-question__options">
+        @for (option of options(); track $index) {
+          <li>
+            <label class="quiz-question__option">
+              <input
+                type="checkbox"
+                [checked]="isMultiSelected($index)"
+                (change)="toggleMulti($index)"
+              />
+              {{ option }}
+            </label>
+          </li>
+        }
+      </ul>
+    }
+    @case ('boolean') {
+      <div class="quiz-question__options quiz-question__options--boolean">
+        <label class="quiz-question__option">
+          <input
+            type="radio"
+            [name]="question().id"
+            [checked]="isBooleanSelected(true)"
+            (change)="selectBoolean(true)"
+          />
+          Prawda
+        </label>
+        <label class="quiz-question__option">
+          <input
+            type="radio"
+            [name]="question().id"
+            [checked]="isBooleanSelected(false)"
+            (change)="selectBoolean(false)"
+          />
+          Fałsz
+        </label>
+      </div>
+    }
+  }
+</fieldset>

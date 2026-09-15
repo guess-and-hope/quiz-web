@@ -1,0 +1,38 @@
+@if (loading()) {
+  <p class="status">Wczytywanie quizu…</p>
+} @else if (error()) {
+  <p class="status status--error">{{ error() }}</p>
+} @else if (quiz(); as quiz) {
+  @if (questions().length === 0) {
+    <p class="status">Ten quiz nie ma jeszcze pytań.</p>
+  } @else {
+    <div class="quiz-play">
+      <header class="quiz-play__header">
+        <h2>{{ quiz.title }}</h2>
+        <span class="quiz-play__progress">{{ progressText() }}</span>
+      </header>
+
+      @if (currentQuestion(); as question) {
+        <app-quiz-question
+          [question]="question"
+          [answer]="currentAnswer()"
+          (answerChange)="onAnswerChange($event)"
+        />
+      }
+
+      <div class="quiz-play__nav">
+        <button type="button" (click)="previous()" [disabled]="isFirst()">Wstecz</button>
+        @if (isLast()) {
+          <button type="button" class="quiz-play__finish" (click)="finish()">
+            Zakończ i sprawdź
+          </button>
+        } @else {
+          <button type="button" (click)="next()">Dalej</button>
+        }
+      </div>
+    </div>
+  }
+} @else {
+  <p class="status">Nie znaleziono quizu.</p>
+  <a routerLink="/quizzes">Wróć do listy</a>
+}
