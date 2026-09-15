@@ -8,7 +8,7 @@ Bez BaaS, bez kont użytkowników, bez rankingów globalnych i pozostałych przy
 ## 1. Cel etapu
 
 Działająca aplikacja quizowa po stronie przeglądarki, w której użytkownik może:
-rozwiązać quiz, dostać punkty oraz zobaczyć które odpowiedzi były poprawne.
+rozwiązać quiz, dostać punkty oraz zobaczyć, które odpowiedzi były poprawne.
 Dane (quizy) trzymane w repozytorium jako pliki JSON — tylko do odczytu.
 
 ## 2. Stack technologiczny
