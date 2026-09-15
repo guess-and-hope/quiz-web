@@ -8,4 +8,5 @@ export const routes: Routes = [
   { path: 'quizzes', component: QuizList },
   { path: 'quiz/:id', component: QuizPlay },
   { path: 'quiz/:id/result', component: QuizResult },
+  { path: '**', redirectTo: 'quizzes' },
 ];
