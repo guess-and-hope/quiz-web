@@ -1,7 +1,7 @@
 {
-  "id": "proste-pytania",
-  "title": "Proste pytania",
-  "description": "Same proste pytania – a przynajmniej tak się wydaje. Uważaj na pułapki: pozornie oczywista odpowiedź często jest błędna.",
+  "id": "ciekawostki",
+  "title": "Ciekawostki",
+  "description": "Zbiór zaskakujących ciekawostek – a przynajmniej tak się wydaje. Uważaj na pułapki: pozornie oczywista odpowiedź często jest błędna.",
   "category": "Ciekawostki",
   "createdAt": "2026-09-19T00:00:00.000Z",
   "updatedAt": "2026-09-19T00:00:00.000Z",
@@ -71,27 +71,27 @@
     },
     {
       "id": "trik-9",
-      "type": "single",
-      "text": "Kto napisał powieść \"Quo Vadis\", za którą otrzymał Literacką Nagrodę Nobla?",
-      "options": ["Henryk Sienkiewicz", "Władysław Reymont", "Czesław Miłosz", "Bolesław Prus"],
-      "correct": 0,
-      "explanation": "Nagrodę Nobla w 1905 roku otrzymał Henryk Sienkiewicz, w dużej mierze dzięki światowej sławie \"Quo Vadis\". Reymont (\"Chłopi\", 1924) i Miłosz (1980) to również polscy nobliści, ale nie za tę powieść, a Bolesław Prus nigdy Nobla nie dostał."
+      "type": "multi",
+      "text": "Które z poniższych roślin są pod względem botanicznym owocami?",
+      "options": ["Ogórek", "Papryka", "Bakłażan", "Dynia", "Groszek zielony"],
+      "correct": [0, 1, 2, 3, 4],
+      "explanation": "Zaskoczenie – wszystkie z nich to botanicznie owoce! Owoc to część rośliny, która rozwija się z zalążni kwiatu i zawiera nasiona. Ogórek, papryka, bakłażan, dynia i groszek spełniają tę definicję, choć w kuchni traktuje się je jak warzywa."
     },
     {
       "id": "trik-10",
       "type": "single",
-      "text": "Który szczyt jest najwyższym punktem całych Tatr, licząc też stronę słowacką?",
-      "options": ["Rysy", "Gerlach", "Łomnica", "Kościelec"],
-      "correct": 1,
-      "explanation": "Rysy (2499 m) to najwyższy szczyt w granicach Polski, ale w całych Tatrach wyższy jest słowacki Gerlach (2655 m). To częsta pułapka, bo Rysy bywają błędnie nazywane \"najwyższym szczytem Tatr\" – w rzeczywistości są najwyższe tylko po polskiej stronie."
+      "text": "Która planeta znajduje się najbliżej Ziemi przez większość czasu?",
+      "options": ["Wenus", "Mars", "Merkury", "Księżyc"],
+      "correct": 2,
+      "explanation": "Choć to Wenus podchodzi najbliżej Ziemi w swoim minimum, obliczenia uwzględniające całe orbity pokazują, że przeciętnie najbliżej jest Merkury – Wenus i Mars więcej czasu spędzają dalej. Księżyc w ogóle nie może być tu poprawną odpowiedzią – to nie planeta, lecz naturalny satelita Ziemi, mimo że wydaje się najbliższym obiektem w kosmosie."
     },
     {
       "id": "trik-11",
       "type": "single",
-      "text": "Ile wynosi 2 + 2 × 2?",
-      "options": ["8", "6", "4", "Nie da się obliczyć"],
+      "text": "Który kraj, którego całe terytorium leży w Europie, ma największą powierzchnię?",
+      "options": ["Francja", "Ukraina", "Hiszpania", "Szwecja", "Niemcy"],
       "correct": 1,
-      "explanation": "Zgodnie z kolejnością działań najpierw wykonuje się mnożenie: 2×2=4, a potem dodawanie: 2+4=6."
+      "explanation": "To Ukraina (ok. 604 tys. km²) jest największym krajem leżącym w całości w Europie – większym niż Francja (ok. 552 tys. km²), która bywa błędnie wskazywana, bo to największe państwo Unii Europejskiej. Rosja, choć ma jeszcze większą powierzchnię, tutaj się nie liczy, bo większa jej część leży w Azji."
     },
     {
       "id": "trik-12",
@@ -118,10 +118,11 @@
     },
     {
       "id": "trik-15",
-      "type": "boolean",
-      "text": "Albert Einstein oblewał matematykę w szkole.",
-      "correct": false,
-      "explanation": "To popularny mit. Einstein radził sobie z matematyką bardzo dobrze już jako nastolatek."
+      "type": "multi",
+      "text": "Z których z poniższych przedmiotów Albert Einstein oblewał w szkole?",
+      "options": ["Matematyka", "Fizyka", "Biologia", "Chemia", "Żadna z powyższych"],
+      "correct": [4],
+      "explanation": "To popularny mit – Einstein nigdy nie oblał żadnego z tych przedmiotów. Wręcz przeciwnie, już jako nastolatek radził sobie świetnie z matematyką i fizyką."
     }
   ]
 }
