@@ -28,10 +28,10 @@ describe('QuizService', () => {
     const service = TestBed.inject(QuizService);
 
     const requests = httpMock.match(() => true);
-    expect(requests.length).toBe(3);
+    expect(requests.length).toBe(4);
     requests.forEach((req) => req.flush(makeQuiz(req.request.url)));
 
-    expect(service.getAll()().length).toBe(3);
+    expect(service.getAll()().length).toBe(4);
     expect(service.isLoading()()).toBe(false);
   });
 

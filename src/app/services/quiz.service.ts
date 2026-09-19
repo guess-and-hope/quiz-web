@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { Quiz } from '../models';
 
-const QUIZ_FILES = ['geografia', 'historia', 'matematyka'];
+const QUIZ_FILES = ['geografia', 'historia', 'matematyka', 'proste-pytania'];
 
 @Injectable({ providedIn: 'root' })
 export class QuizService {

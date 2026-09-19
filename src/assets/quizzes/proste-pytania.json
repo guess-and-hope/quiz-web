@@ -1,0 +1,133 @@
+{
+  "id": "proste-pytania",
+  "title": "Proste pytania",
+  "description": "Same proste pytania – a przynajmniej tak się wydaje. Uważaj na pułapki: pozornie oczywista odpowiedź często jest błędna.",
+  "category": "Ciekawostki",
+  "createdAt": "2026-09-19T00:00:00.000Z",
+  "updatedAt": "2026-09-19T00:00:00.000Z",
+  "questions": [
+    {
+      "id": "trik-1",
+      "type": "single",
+      "text": "Jaka jest największa pustynia świata?",
+      "options": ["Sahara", "Antarktyda", "Pustynia Gobi", "Kalahari"],
+      "correct": 1,
+      "explanation": "Antarktyda to technicznie pustynia (bardzo mało opadów) i jest największa na świecie – Sahara jest największą pustynią gorącą, ale nie największą w ogóle."
+    },
+    {
+      "id": "trik-2",
+      "type": "single",
+      "text": "Kto był pierwszym koronowanym królem Polski?",
+      "options": ["Mieszko I", "Bolesław I Chrobry", "Kazimierz Wielki", "Władysław Łokietek"],
+      "correct": 1,
+      "explanation": "Mieszko I był pierwszym historycznym władcą Polski, ale nigdy nie został koronowany. Pierwszym królem Polski był Bolesław I Chrobry, koronowany w 1025 roku."
+    },
+    {
+      "id": "trik-3",
+      "type": "multi",
+      "text": "Które z poniższych stwierdzeń o biblijnej arce i potopie są prawdziwe?",
+      "options": [
+        "Arkę zbudował Noe",
+        "Na arkę zabrano zwierzęta parami",
+        "Arkę zbudował Mojżesz",
+        "Potop trwał 40 dni i 40 nocy",
+        "Arka osiadła na górze Synaj"
+      ],
+      "correct": [0, 1, 3],
+      "explanation": "To Noe, a nie Mojżesz, zbudował arkę i zabrał na nią zwierzęta parami. Potop trwał, według Biblii, 40 dni i nocy. Arka osiadła na górze Ararat, a nie Synaj – to inna, osobna góra znana z historii Mojżesza i Dziesięciu Przykazań."
+    },
+    {
+      "id": "trik-4",
+      "type": "single",
+      "text": "Z którym krajem Polska ma najdłuższą granicę lądową?",
+      "options": ["Niemcy", "Czechy", "Ukraina", "Białoruś"],
+      "correct": 1,
+      "explanation": "Granica z Czechami liczy ok. 796 km i jest najdłuższa, mimo że wiele osób wskazuje Niemcy (ok. 467 km)."
+    },
+    {
+      "id": "trik-5",
+      "type": "single",
+      "text": "Ile miesięcy w roku ma co najmniej 28 dni?",
+      "options": ["1", "6", "12", "Żaden"],
+      "correct": 2,
+      "explanation": "Każdy miesiąc ma co najmniej 28 dni – nie tylko luty. To klasyczna pułapka słowna."
+    },
+    {
+      "id": "trik-6",
+      "type": "boolean",
+      "text": "Wielki Mur Chiński jest jedyną budowlą widoczną z kosmosu gołym okiem.",
+      "correct": false,
+      "explanation": "To popularny mit – Wielkiego Muru Chińskiego nie widać gołym okiem z orbity, a wiele innych struktur bywa równie trudnych lub łatwych do zauważenia."
+    },
+    {
+      "id": "trik-7",
+      "type": "multi",
+      "text": "Które z poniższych zwierząt są ssakami?",
+      "options": ["Delfin", "Rekin", "Nietoperz", "Krokodyl", "Wieloryb"],
+      "correct": [0, 2, 4],
+      "explanation": "Rekin to ryba, a krokodyl to gad. Delfin, nietoperz i wieloryb są ssakami, mimo że żyją w wodzie lub latają."
+    },
+    {
+      "id": "trik-8",
+      "type": "single",
+      "text": "Który kraj ma obecnie największą liczbę ludności na świecie?",
+      "options": ["Chiny", "Indie", "Stany Zjednoczone", "Indonezja"],
+      "correct": 1,
+      "explanation": "Od 2023 roku Indie mają więcej mieszkańców niż Chiny, mimo że przez dekady to Chiny kojarzono z najludniejszym krajem świata."
+    },
+    {
+      "id": "trik-9",
+      "type": "single",
+      "text": "Kto napisał powieść \"Quo Vadis\", za którą otrzymał Literacką Nagrodę Nobla?",
+      "options": ["Henryk Sienkiewicz", "Władysław Reymont", "Czesław Miłosz", "Bolesław Prus"],
+      "correct": 0,
+      "explanation": "Nagrodę Nobla w 1905 roku otrzymał Henryk Sienkiewicz, w dużej mierze dzięki światowej sławie \"Quo Vadis\". Reymont (\"Chłopi\", 1924) i Miłosz (1980) to również polscy nobliści, ale nie za tę powieść, a Bolesław Prus nigdy Nobla nie dostał."
+    },
+    {
+      "id": "trik-10",
+      "type": "single",
+      "text": "Który szczyt jest najwyższym punktem całych Tatr, licząc też stronę słowacką?",
+      "options": ["Rysy", "Gerlach", "Łomnica", "Kościelec"],
+      "correct": 1,
+      "explanation": "Rysy (2499 m) to najwyższy szczyt w granicach Polski, ale w całych Tatrach wyższy jest słowacki Gerlach (2655 m). To częsta pułapka, bo Rysy bywają błędnie nazywane \"najwyższym szczytem Tatr\" – w rzeczywistości są najwyższe tylko po polskiej stronie."
+    },
+    {
+      "id": "trik-11",
+      "type": "single",
+      "text": "Ile wynosi 2 + 2 × 2?",
+      "options": ["8", "6", "4", "Nie da się obliczyć"],
+      "correct": 1,
+      "explanation": "Zgodnie z kolejnością działań najpierw wykonuje się mnożenie: 2×2=4, a potem dodawanie: 2+4=6."
+    },
+    {
+      "id": "trik-12",
+      "type": "multi",
+      "text": "Które z poniższych zwierząt mają więcej niż 6 nóg?",
+      "options": ["Pająk", "Mrówka", "Stonoga", "Pszczoła", "Krab"],
+      "correct": [0, 2, 4],
+      "explanation": "Mrówka i pszczoła to owady – mają po 6 nóg. Pająk ma 8, stonoga kilkadziesiąt, a krab 10."
+    },
+    {
+      "id": "trik-13",
+      "type": "boolean",
+      "text": "Pod względem botanicznym pomidor jest owocem, a nie warzywem.",
+      "correct": true,
+      "explanation": "Botanicznie pomidor to owoc (jagoda), choć w kuchni i handlu tradycyjnie traktuje się go jak warzywo."
+    },
+    {
+      "id": "trik-14",
+      "type": "single",
+      "text": "Jaki jest największy organ w ciele człowieka?",
+      "options": ["Wątroba", "Płuca", "Skóra", "Mózg"],
+      "correct": 2,
+      "explanation": "Skóra jest największym organem człowieka – u dorosłego może ważyć nawet ok. 4 kg i mieć powierzchnię do 2 m²."
+    },
+    {
+      "id": "trik-15",
+      "type": "boolean",
+      "text": "Albert Einstein oblewał matematykę w szkole.",
+      "correct": false,
+      "explanation": "To popularny mit. Einstein radził sobie z matematyką bardzo dobrze już jako nastolatek."
+    }
+  ]
+}
