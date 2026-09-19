@@ -34,7 +34,7 @@
       "id": "trik-4",
       "type": "single",
       "text": "Z którym krajem Polska ma najdłuższą granicę lądową?",
-      "options": ["Niemcy", "Czechy", "Ukraina", "Białoruś"],
+      "options": ["Niemcy", "Czechy", "Ukraina", "Białoruś", "Słowacja"],
       "correct": 1,
       "explanation": "Granica z Czechami liczy ok. 796 km i jest najdłuższa, mimo że wiele osób wskazuje Niemcy (ok. 467 km)."
     },
@@ -48,10 +48,11 @@
     },
     {
       "id": "trik-6",
-      "type": "boolean",
-      "text": "Wielki Mur Chiński jest jedyną budowlą widoczną z kosmosu gołym okiem.",
-      "correct": false,
-      "explanation": "To popularny mit – Wielkiego Muru Chińskiego nie widać gołym okiem z orbity, a wiele innych struktur bywa równie trudnych lub łatwych do zauważenia."
+      "type": "single",
+      "text": "Ile lat tak naprawdę trwała wojna stuletnia?",
+      "options": ["42 lata", "100 lat", "108 lat", "116 lat", "150 lat"],
+      "correct": 3,
+      "explanation": "Wbrew nazwie, wojna stuletnia między Anglią a Francją trwała w rzeczywistości 116 lat (1337–1453), z licznymi przerwami w walkach. \"42 lata\" to tylko żartobliwe nawiązanie do słynnej odpowiedzi na \"Pytanie o Życie, Wszechświat i Całą Resztę\" z \"Autostopem przez Galaktykę\"."
     },
     {
       "id": "trik-7",
@@ -102,13 +103,6 @@
       "explanation": "Mrówka i pszczoła to owady – mają po 6 nóg. Pająk ma 8, stonoga kilkadziesiąt, a krab 10."
     },
     {
-      "id": "trik-13",
-      "type": "boolean",
-      "text": "Pod względem botanicznym pomidor jest owocem, a nie warzywem.",
-      "correct": true,
-      "explanation": "Botanicznie pomidor to owoc (jagoda), choć w kuchni i handlu tradycyjnie traktuje się go jak warzywo."
-    },
-    {
       "id": "trik-14",
       "type": "single",
       "text": "Jaki jest największy organ w ciele człowieka?",
@@ -123,6 +117,14 @@
       "options": ["Matematyka", "Fizyka", "Biologia", "Chemia", "Żadna z powyższych"],
       "correct": [4],
       "explanation": "To popularny mit – Einstein nigdy nie oblał żadnego z tych przedmiotów. Wręcz przeciwnie, już jako nastolatek radził sobie świetnie z matematyką i fizyką."
+    },
+    {
+      "id": "trik-16",
+      "type": "single",
+      "text": "Ile razy trzeba złożyć kartkę papieru na pół, żeby jej grubość przekroczyła odległość do Księżyca (ok. 384 400 km)?",
+      "options": ["42", "934", "12 012", "Nigdy, to fizycznie niemożliwe"],
+      "correct": 0,
+      "explanation": "Grubość kartki podwaja się z każdym złożeniem (wzrost wykładniczy), więc już ok. 42 złożenia wystarczą, by przekroczyć odległość do Księżyca – choć fizycznie kartki nie da się złożyć więcej niż 7–8 razy."
     }
   ]
 }
