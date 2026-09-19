@@ -24,17 +24,11 @@
     },
     {
       "id": "trik-3",
-      "type": "multi",
-      "text": "Które z poniższych stwierdzeń o biblijnej arce i potopie są prawdziwe?",
-      "options": [
-        "Arkę zbudował Noe",
-        "Na arkę zabrano zwierzęta parami",
-        "Arkę zbudował Mojżesz",
-        "Potop trwał 40 dni i 40 nocy",
-        "Arka osiadła na górze Synaj"
-      ],
-      "correct": [0, 1, 3],
-      "explanation": "To Noe, a nie Mojżesz, zbudował arkę i zabrał na nią zwierzęta parami. Potop trwał, według Biblii, 40 dni i nocy. Arka osiadła na górze Ararat, a nie Synaj – to inna, osobna góra znana z historii Mojżesza i Dziesięciu Przykazań."
+      "type": "single",
+      "text": "Który kraj ma najwięcej stref czasowych?",
+      "options": ["Rosja", "Francja", "Stany Zjednoczone", "Chiny"],
+      "correct": 1,
+      "explanation": "To Francja, a nie Rosja, ma najwięcej stref czasowych na świecie – aż 12, dzięki terytoriom zamorskim jak Polinezja Francuska czy Gujana Francuska. Rosja ma ich 11. Ciekawostka: Chiny, mimo ogromnego terytorium rozciągającego się na szerokość geograficzną odpowiadającą aż 5 strefom, oficjalnie używają tylko jednej."
     },
     {
       "id": "trik-4",
