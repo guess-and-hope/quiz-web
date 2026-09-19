@@ -4,16 +4,36 @@
 }
 
 .app-header {
-  padding: 1.5rem 1rem;
+  width: fit-content;
+  max-width: calc(100% - 2rem);
+  margin: 1rem auto 0;
+  padding: 1rem 1.75rem;
+  background: #fff;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 1.25rem;
+  box-shadow: 6px 6px 0 var(--ink);
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
 
   h1 {
-    margin: 0;
-    font-size: 1.5rem;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 }
 
 .app-main {
-  padding-block: 1.5rem;
+  padding: 1.5rem 1rem 3rem;
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    margin: 0.75rem auto 0;
+    padding: 0.85rem 1.1rem;
+    border-radius: 1rem;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .app-header h1 {
+    white-space: normal;
+  }
 }

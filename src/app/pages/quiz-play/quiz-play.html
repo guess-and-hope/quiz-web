@@ -7,9 +7,18 @@
     <p class="status">Ten quiz nie ma jeszcze pytań.</p>
   } @else {
     <div class="quiz-play">
+      <a routerLink="/quizzes" class="quiz-play__exit">← Wróć do listy</a>
+
       <header class="quiz-play__header">
-        <h2>{{ quiz.title }}</h2>
-        <span class="quiz-play__progress">{{ progressText() }}</span>
+        <div class="quiz-play__header-row">
+          <h2>{{ quiz.title }}</h2>
+          <span class="quiz-play__progress">{{ progressText() }}</span>
+        </div>
+        <div class="quiz-play__progress-track" aria-hidden="true">
+          @for (filled of progressSegments(); track $index) {
+            <span class="quiz-play__progress-seg" [class.quiz-play__progress-seg--filled]="filled"></span>
+          }
+        </div>
       </header>
 
       @if (currentQuestion(); as question) {
@@ -21,13 +30,15 @@
       }
 
       <div class="quiz-play__nav">
-        <button type="button" (click)="previous()" [disabled]="isFirst()">Wstecz</button>
+        @if (!isFirst()) {
+          <button type="button" class="quiz-play__back" (click)="previous()">Wstecz</button>
+        }
         @if (isLast()) {
           <button type="button" class="quiz-play__finish" (click)="finish()">
             Zakończ i sprawdź
           </button>
         } @else {
-          <button type="button" (click)="next()">Dalej</button>
+          <button type="button" class="quiz-play__next" (click)="next()">Dalej</button>
         }
       </div>
     </div>
