@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Ranking } from './ranking';
 import { RankingEntry, ResultsService } from '../../services/results.service';
 import { Quiz } from '../../models';
+import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
 
 const quiz: Quiz = {
   id: 'geografia',
@@ -33,20 +32,13 @@ const entries: RankingEntry[] = [
   },
 ];
 
-function flushQuizzes(): void {
-  TestBed.inject(HttpTestingController)
-    .match(() => true)
-    .forEach((req, i) => req.flush(i === 0 ? quiz : { ...quiz, id: `other-${i}` }));
-}
-
 describe('Ranking', () => {
   it('renders the top results fetched for the quiz', async () => {
     await TestBed.configureTestingModule({
       imports: [Ranking],
       providers: [
         provideRouter([]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
+        provideQuizServiceStub([quiz]),
         {
           provide: ResultsService,
           useValue: { topForQuiz: async () => ({ entries, error: null }) },
@@ -56,7 +48,6 @@ describe('Ranking', () => {
 
     const fixture = TestBed.createComponent(Ranking);
     fixture.componentRef.setInput('id', 'geografia');
-    flushQuizzes();
 
     fixture.detectChanges();
     await fixture.whenStable();
@@ -74,8 +65,7 @@ describe('Ranking', () => {
       imports: [Ranking],
       providers: [
         provideRouter([]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
+        provideQuizServiceStub([quiz]),
         {
           provide: ResultsService,
           useValue: { topForQuiz: async () => ({ entries: [], error: null }) },
@@ -85,7 +75,6 @@ describe('Ranking', () => {
 
     const fixture = TestBed.createComponent(Ranking);
     fixture.componentRef.setInput('id', 'geografia');
-    flushQuizzes();
 
     fixture.detectChanges();
     await fixture.whenStable();
