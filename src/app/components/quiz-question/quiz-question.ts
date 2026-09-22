@@ -17,6 +17,10 @@ export class QuizQuestion {
     return question.type === 'single' || question.type === 'multi' ? question.options : [];
   });
 
+  protected readonly choiceHint = computed(() =>
+    this.question().type === 'multi' ? 'Wielokrotny wybór' : 'Jednokrotny wybór',
+  );
+
   protected isSingleSelected(index: number): boolean {
     return this.answer() === index;
   }
