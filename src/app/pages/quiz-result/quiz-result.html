@@ -15,6 +15,41 @@
         <p class="quiz-result__score">
           {{ score.correct }} / {{ score.total }} — {{ score.percentage }}%
         </p>
+
+        <div class="quiz-result__save">
+          @if (saved()) {
+            <p class="quiz-result__save-confirm">Zapisano jako <strong>{{ playerName() }}</strong> ✓</p>
+          } @else if (editingName()) {
+            <div class="quiz-result__save-form">
+              <input
+                type="text"
+                class="quiz-result__name-input"
+                placeholder="Twój nick"
+                [value]="nameDraft()"
+                (input)="onNameInput($event)"
+                maxlength="24"
+              />
+              <button
+                type="button"
+                class="quiz-result__save-btn"
+                [disabled]="!nameDraft().trim()"
+                (click)="saveResult()"
+              >
+                Zapisz wynik
+              </button>
+            </div>
+          } @else {
+            <div class="quiz-result__save-form">
+              <p class="quiz-result__playing-as">Grasz jako <strong>{{ playerName() }}</strong></p>
+              <button type="button" class="quiz-result__save-btn" (click)="saveResult()">
+                Zapisz wynik
+              </button>
+              <button type="button" class="quiz-result__change-name" (click)="startEditingName()">
+                to nie Ty? zmień
+              </button>
+            </div>
+          }
+        </div>
       </header>
 
       <ol class="quiz-result__list">
