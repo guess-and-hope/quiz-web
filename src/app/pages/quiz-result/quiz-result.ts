@@ -1,8 +1,9 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { AttemptService } from '../../services/attempt.service';
 import { ScoringService } from '../../services/scoring.service';
+import { PlayerIdentityService } from '../../services/player-identity.service';
 import { AnswerValue, Question } from '../../models';
 
 interface QuestionReview {
@@ -24,6 +25,7 @@ export class QuizResult {
   private readonly quizService = inject(QuizService);
   private readonly attemptService = inject(AttemptService);
   private readonly scoringService = inject(ScoringService);
+  private readonly playerIdentity = inject(PlayerIdentityService);
 
   protected readonly loading = this.quizService.isLoading();
   protected readonly error = this.quizService.getError();
@@ -60,6 +62,31 @@ export class QuizResult {
       };
     });
   });
+
+  protected readonly playerName = this.playerIdentity.playerName;
+  protected readonly nameDraft = signal(this.playerIdentity.playerName());
+  protected readonly editingName = signal(!this.playerIdentity.playerName());
+  protected readonly saved = signal(false);
+
+  protected onNameInput(event: Event): void {
+    this.nameDraft.set((event.target as HTMLInputElement).value);
+  }
+
+  protected startEditingName(): void {
+    this.nameDraft.set(this.playerIdentity.playerName());
+    this.editingName.set(true);
+    this.saved.set(false);
+  }
+
+  protected saveResult(): void {
+    const name = this.nameDraft().trim();
+    if (!name) {
+      return;
+    }
+    this.playerIdentity.setPlayerName(name);
+    this.editingName.set(false);
+    this.saved.set(true);
+  }
 
   private formatAnswer(question: Question, answer: AnswerValue | undefined): string {
     return answer === undefined ? 'Brak odpowiedzi' : this.formatValue(question, answer);
