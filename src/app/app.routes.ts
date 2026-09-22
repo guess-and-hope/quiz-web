@@ -2,11 +2,13 @@ import { Routes } from '@angular/router';
 import { QuizList } from './pages/quiz-list/quiz-list';
 import { QuizPlay } from './pages/quiz-play/quiz-play';
 import { QuizResult } from './pages/quiz-result/quiz-result';
+import { Ranking } from './pages/ranking/ranking';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'quizzes', pathMatch: 'full' },
   { path: 'quizzes', component: QuizList },
   { path: 'quiz/:id', component: QuizPlay },
   { path: 'quiz/:id/result', component: QuizResult },
+  { path: 'quiz/:id/ranking', component: Ranking },
   { path: '**', redirectTo: 'quizzes' },
 ];
