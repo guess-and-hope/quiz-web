@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 
 @Component({
   selector: 'app-quiz-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './quiz-list.html',
   styleUrl: './quiz-list.scss',
 })

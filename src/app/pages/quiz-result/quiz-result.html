@@ -19,6 +19,9 @@
         <div class="quiz-result__save">
           @if (saved()) {
             <p class="quiz-result__save-confirm">Zapisano jako <strong>{{ playerName() }}</strong> ✓</p>
+            <a class="quiz-result__ranking-link" [routerLink]="['/quiz', quiz.id, 'ranking']">
+              Zobacz ranking →
+            </a>
           } @else if (editingName()) {
             <div class="quiz-result__save-form">
               <input
