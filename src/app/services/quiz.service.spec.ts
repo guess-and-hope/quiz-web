@@ -1,49 +1,74 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { QuizService } from './quiz.service';
-import { Quiz } from '../models';
+import { SupabaseService } from './supabase.service';
 
-const makeQuiz = (id: string): Quiz => ({
-  id,
-  title: id,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  questions: [],
-});
+const rows = [
+  {
+    id: 'geografia',
+    title: 'Geografia świata',
+    description: null,
+    category: null,
+    created_at: '2026-01-01T00:00:00.000Z',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    questions: [],
+  },
+  {
+    id: 'historia',
+    title: 'Historia',
+    description: 'Opis',
+    category: 'Historia',
+    created_at: '2026-01-02T00:00:00.000Z',
+    updated_at: '2026-01-02T00:00:00.000Z',
+    questions: [],
+  },
+];
+
+function provideSupabaseStub(data: unknown, error: unknown = null) {
+  return {
+    provide: SupabaseService,
+    useValue: {
+      client: {
+        from: () => ({
+          select: () => ({
+            order: () => Promise.resolve({ data, error }),
+          }),
+        }),
+      },
+    },
+  };
+}
+
+// QuizService ładuje quizy asynchronicznie w konstruktorze — pozwól mikro/makro-taskom się rozliczyć.
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 describe('QuizService', () => {
-  let httpMock: HttpTestingController;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
-    });
-    httpMock = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => httpMock.verify());
-
-  it('loads all starter quizzes and exposes them as a signal', () => {
+  it('loads quizzes from Supabase and exposes them as a signal', async () => {
+    TestBed.configureTestingModule({ providers: [provideSupabaseStub(rows)] });
     const service = TestBed.inject(QuizService);
 
-    const requests = httpMock.match(() => true);
-    expect(requests.length).toBe(4);
-    requests.forEach((req) => req.flush(makeQuiz(req.request.url)));
+    await flush();
 
-    expect(service.getAll()().length).toBe(4);
+    expect(service.getAll()().length).toBe(2);
     expect(service.isLoading()()).toBe(false);
+    expect(service.getError()()).toBeNull();
+
+    // mapowanie snake_case -> camelCase oraz null -> undefined
+    const geografia = service.getById('geografia')();
+    expect(geografia?.description).toBeUndefined();
+    expect(geografia?.createdAt).toBe('2026-01-01T00:00:00.000Z');
+    expect(service.getById('brak')()).toBeUndefined();
   });
 
-  it('getById returns the matching quiz once loaded', () => {
+  it('exposes an error message when the query fails', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideSupabaseStub(null, { message: 'boom' })],
+    });
     const service = TestBed.inject(QuizService);
 
-    httpMock.match(() => true).forEach((req) => {
-      const id = req.request.url.split('/').pop()!.replace('.json', '');
-      req.flush(makeQuiz(id));
-    });
+    await flush();
 
-    expect(service.getById('geografia')()?.id).toBe('geografia');
-    expect(service.getById('brak')()).toBeUndefined();
+    expect(service.getError()()).toBe('Nie udało się wczytać quizów.');
+    expect(service.isLoading()()).toBe(false);
+    expect(service.getAll()().length).toBe(0);
   });
 });

@@ -1,17 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { QuizList } from './quiz-list';
+import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
 
 describe('QuizList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [QuizList],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideQuizServiceStub()],
     }).compileComponents();
-
-    TestBed.inject(HttpTestingController).match(() => true);
   });
 
   it('should create', () => {
