@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { QuizPlay } from './quiz-play';
 import { Quiz } from '../../models';
+import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
 
 const quiz: Quiz = {
   id: 'geografia',
@@ -20,17 +19,13 @@ describe('QuizPlay', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [QuizPlay],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideQuizServiceStub([quiz])],
     }).compileComponents();
   });
 
   it('renders the first question with progress, then advances after answering', () => {
     const fixture = TestBed.createComponent(QuizPlay);
     fixture.componentRef.setInput('id', 'geografia');
-
-    TestBed.inject(HttpTestingController)
-      .match(() => true)
-      .forEach((req, i) => req.flush(i === 0 ? quiz : { ...quiz, id: `other-${i}` }));
 
     fixture.detectChanges();
 

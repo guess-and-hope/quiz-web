@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { QuizResult } from './quiz-result';
 import { AttemptService } from '../../services/attempt.service';
 import { Quiz } from '../../models';
+import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
 
 const quiz: Quiz = {
   id: 'geografia',
@@ -27,11 +26,6 @@ const quiz: Quiz = {
 function createFixture() {
   const fixture = TestBed.createComponent(QuizResult);
   fixture.componentRef.setInput('id', 'geografia');
-
-  TestBed.inject(HttpTestingController)
-    .match(() => true)
-    .forEach((req, i) => req.flush(i === 0 ? quiz : { ...quiz, id: `other-${i}` }));
-
   return fixture;
 }
 
@@ -39,7 +33,7 @@ describe('QuizResult', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [QuizResult],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideRouter([]), provideQuizServiceStub([quiz])],
     }).compileComponents();
   });
 
