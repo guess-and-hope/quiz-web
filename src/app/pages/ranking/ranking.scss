@@ -41,6 +41,31 @@
   color: #6b6553;
 }
 
+.ranking__sort {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.ranking__sort-btn {
+  padding: 0.5rem 1.1rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+
+  &--active {
+    background: var(--pink);
+    color: #fff;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+}
+
 .ranking__list {
   display: flex;
   flex-direction: column;

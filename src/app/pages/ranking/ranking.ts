@@ -3,6 +3,9 @@ import { RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { PlayerIdentityService } from '../../services/player-identity.service';
 import { RankingEntry, ResultsService } from '../../services/results.service';
+import { formatDuration } from '../../shared/format-duration';
+
+export type RankingSort = 'score' | 'time';
 
 @Component({
   selector: 'app-ranking',
@@ -24,6 +27,15 @@ export class Ranking {
   protected readonly entries = signal<RankingEntry[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly sortBy = signal<RankingSort>('score');
+
+  protected readonly sortedEntries = computed(() => {
+    const list = [...this.entries()];
+    if (this.sortBy() === 'time') {
+      list.sort((a, b) => (a.durationSeconds ?? Infinity) - (b.durationSeconds ?? Infinity));
+    }
+    return list;
+  });
 
   private readonly deviceId = this.playerIdentity.getDeviceId();
 
@@ -36,6 +48,14 @@ export class Ranking {
 
   protected isMe(entry: RankingEntry): boolean {
     return entry.deviceId !== null && entry.deviceId === this.deviceId;
+  }
+
+  protected setSortBy(sort: RankingSort): void {
+    this.sortBy.set(sort);
+  }
+
+  protected formatTime(seconds: number | null): string {
+    return seconds === null ? '—' : formatDuration(seconds);
   }
 
   private async load(quizId: string): Promise<void> {

@@ -21,6 +21,7 @@ const entries: RankingEntry[] = [
     correct: 9,
     total: 10,
     percentage: 90,
+    durationSeconds: 120,
     createdAt: '2026-01-01T00:00:00.000Z',
   },
   {
@@ -29,6 +30,7 @@ const entries: RankingEntry[] = [
     correct: 8,
     total: 10,
     percentage: 80,
+    durationSeconds: 45,
     createdAt: '2026-01-02T00:00:00.000Z',
   },
 ];
@@ -92,5 +94,44 @@ describe('Ranking', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Nikt jeszcze nie zapisał wyniku');
+  });
+
+  it('reorders entries by time when the "Wg czasu" toggle is clicked', async () => {
+    await TestBed.configureTestingModule({
+      imports: [Ranking],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: ResultsService,
+          useValue: { topForQuiz: async () => ({ entries, error: null }) },
+        },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Ranking);
+    fixture.componentRef.setInput('id', 'geografia');
+    flushQuizzes();
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    const namesInOrder = () =>
+      Array.from(el.querySelectorAll('.ranking__name')).map((n) => n.textContent?.trim().split('\n')[0]);
+
+    // Domyślnie (wg wyniku) Kuba (90%) jest pierwszy.
+    expect(namesInOrder()[0]).toContain('Kuba');
+
+    const timeButton = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === 'Wg czasu',
+    )!;
+    timeButton.click();
+    fixture.detectChanges();
+
+    // Po przełączeniu na czas Asia (45s) wyprzedza Kubę (120s).
+    expect(namesInOrder()[0]).toContain('Asia');
   });
 });

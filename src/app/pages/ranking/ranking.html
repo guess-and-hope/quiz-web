@@ -7,6 +7,27 @@
       <p class="ranking__subtitle">Top 10 najlepszych wyników</p>
     </header>
 
+    @if (!loading() && !error() && entries().length > 0) {
+      <div class="ranking__sort">
+        <button
+          type="button"
+          class="ranking__sort-btn"
+          [class.ranking__sort-btn--active]="sortBy() === 'score'"
+          (click)="setSortBy('score')"
+        >
+          Wg wyniku
+        </button>
+        <button
+          type="button"
+          class="ranking__sort-btn"
+          [class.ranking__sort-btn--active]="sortBy() === 'time'"
+          (click)="setSortBy('time')"
+        >
+          Wg czasu
+        </button>
+      </div>
+    }
+
     @if (loading()) {
       <p class="ranking__status">Wczytywanie rankingu…</p>
     } @else if (error()) {
@@ -19,7 +40,7 @@
       </p>
     } @else {
       <ol class="ranking__list">
-        @for (entry of entries(); track $index) {
+        @for (entry of sortedEntries(); track $index) {
           <li class="ranking__item" [class.ranking__item--me]="isMe(entry)">
             <span class="ranking__rank">{{ $index + 1 }}</span>
             <span class="ranking__name">
@@ -28,7 +49,9 @@
                 <span class="ranking__badge">to Ty</span>
               }
             </span>
-            <span class="ranking__detail">{{ entry.correct }} / {{ entry.total }}</span>
+            <span class="ranking__detail">
+              {{ entry.correct }} / {{ entry.total }} · {{ formatTime(entry.durationSeconds) }}
+            </span>
             <span class="ranking__score">{{ entry.percentage }}%</span>
           </li>
         }

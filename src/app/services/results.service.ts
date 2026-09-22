@@ -9,6 +9,7 @@ export interface QuizResultInput {
   correct: number;
   total: number;
   percentage: number;
+  durationSeconds: number;
 }
 
 export interface RankingEntry {
@@ -17,6 +18,7 @@ export interface RankingEntry {
   correct: number;
   total: number;
   percentage: number;
+  durationSeconds: number | null;
   createdAt: string;
 }
 
@@ -26,6 +28,7 @@ interface ResultsRow {
   correct: number;
   total: number;
   percentage: number;
+  duration_seconds: number | null;
   created_at: string;
 }
 
@@ -47,6 +50,7 @@ export class ResultsService {
       correct: result.correct,
       total: result.total,
       percentage: result.percentage,
+      duration_seconds: result.durationSeconds,
     });
 
     return { error: error ? error.message : null };
@@ -63,7 +67,7 @@ export class ResultsService {
   ): Promise<{ entries: RankingEntry[]; error: string | null }> {
     const { data, error } = await this.supabase.client
       .from('results')
-      .select('player_name, device_id, correct, total, percentage, created_at')
+      .select('player_name, device_id, correct, total, percentage, duration_seconds, created_at')
       .eq('quiz_id', quizId)
       .order('percentage', { ascending: false })
       .order('correct', { ascending: false })
@@ -88,6 +92,7 @@ export class ResultsService {
         correct: row.correct,
         total: row.total,
         percentage: row.percentage,
+        durationSeconds: row.duration_seconds,
         createdAt: row.created_at,
       });
       if (entries.length >= limit) {

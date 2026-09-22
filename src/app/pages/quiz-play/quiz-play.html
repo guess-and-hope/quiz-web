@@ -12,6 +12,21 @@
       <header class="quiz-play__header">
         <div class="quiz-play__header-row">
           <h2>{{ quiz.title }}</h2>
+          <span class="quiz-play__timer" aria-label="Czas trwania">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            {{ elapsedText() }}
+          </span>
           <span class="quiz-play__progress">{{ progressText() }}</span>
         </div>
         <div class="quiz-play__progress-track" aria-hidden="true">
