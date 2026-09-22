@@ -32,22 +32,31 @@
               <button
                 type="button"
                 class="quiz-result__save-btn"
-                [disabled]="!nameDraft().trim()"
+                [disabled]="!nameDraft().trim() || saving()"
                 (click)="saveResult()"
               >
-                Zapisz wynik
+                {{ saving() ? 'Zapisywanie…' : 'Zapisz wynik' }}
               </button>
             </div>
           } @else {
             <div class="quiz-result__save-form">
               <p class="quiz-result__playing-as">Grasz jako <strong>{{ playerName() }}</strong></p>
-              <button type="button" class="quiz-result__save-btn" (click)="saveResult()">
-                Zapisz wynik
+              <button
+                type="button"
+                class="quiz-result__save-btn"
+                [disabled]="saving()"
+                (click)="saveResult()"
+              >
+                {{ saving() ? 'Zapisywanie…' : 'Zapisz wynik' }}
               </button>
               <button type="button" class="quiz-result__change-name" (click)="startEditingName()">
                 to nie Ty? zmień
               </button>
             </div>
+          }
+
+          @if (saveError()) {
+            <p class="quiz-result__save-error">Nie udało się zapisać: {{ saveError() }}</p>
           }
         </div>
       </header>
