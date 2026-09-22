@@ -90,8 +90,7 @@ describe('Ranking', () => {
       imports: [Ranking],
       providers: [
         provideRouter([]),
-        provideHttpClient(),
-        provideHttpClientTesting(),
+        provideQuizServiceStub([quiz]),
         {
           provide: ResultsService,
           useValue: { topForQuiz: async () => ({ entries, error: null }) },
@@ -101,7 +100,6 @@ describe('Ranking', () => {
 
     const fixture = TestBed.createComponent(Ranking);
     fixture.componentRef.setInput('id', 'geografia');
-    flushQuizzes();
 
     fixture.detectChanges();
     await fixture.whenStable();
