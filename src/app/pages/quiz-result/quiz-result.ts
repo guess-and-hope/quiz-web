@@ -5,6 +5,7 @@ import { UserQuizService } from '../../services/user-quiz.service';
 import { AttemptService } from '../../services/attempt.service';
 import { ScoringService } from '../../services/scoring.service';
 import { PlayerIdentityService } from '../../services/player-identity.service';
+import { ResultsService } from '../../services/results.service';
 import { AnswerValue, Question } from '../../models';
 
 interface QuestionReview {
@@ -28,6 +29,7 @@ export class QuizResult {
   private readonly attemptService = inject(AttemptService);
   private readonly scoringService = inject(ScoringService);
   private readonly playerIdentity = inject(PlayerIdentityService);
+  private readonly resultsService = inject(ResultsService);
 
   protected readonly loading = this.quizService.isLoading();
   protected readonly error = this.quizService.getError();
@@ -73,6 +75,8 @@ export class QuizResult {
   protected readonly nameDraft = signal(this.playerIdentity.playerName());
   protected readonly editingName = signal(!this.playerIdentity.playerName());
   protected readonly saved = signal(false);
+  protected readonly saving = signal(false);
+  protected readonly saveError = signal<string | null>(null);
 
   protected onNameInput(event: Event): void {
     this.nameDraft.set((event.target as HTMLInputElement).value);
@@ -82,14 +86,38 @@ export class QuizResult {
     this.nameDraft.set(this.playerIdentity.playerName());
     this.editingName.set(true);
     this.saved.set(false);
+    this.saveError.set(null);
   }
 
-  protected saveResult(): void {
+  protected async saveResult(): Promise<void> {
     const name = this.nameDraft().trim();
-    if (!name) {
+    const quiz = this.quiz();
+    const score = this.score();
+    if (!name || !quiz || !score || this.saving()) {
       return;
     }
+
     this.playerIdentity.setPlayerName(name);
+    this.saving.set(true);
+    this.saveError.set(null);
+
+    const { error } = await this.resultsService.save({
+      quizId: quiz.id,
+      quizTitle: quiz.title,
+      playerName: name,
+      deviceId: this.playerIdentity.getDeviceId(),
+      correct: score.correct,
+      total: score.total,
+      percentage: score.percentage,
+    });
+
+    this.saving.set(false);
+
+    if (error) {
+      this.saveError.set(error);
+      return;
+    }
+
     this.editingName.set(false);
     this.saved.set(true);
   }

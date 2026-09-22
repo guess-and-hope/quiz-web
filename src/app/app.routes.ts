@@ -4,6 +4,7 @@ import { QuizPlay } from './pages/quiz-play/quiz-play';
 import { QuizResult } from './pages/quiz-result/quiz-result';
 import { MyQuizzes } from './pages/my-quizzes/my-quizzes';
 import { QuizEditor } from './pages/quiz-editor/quiz-editor';
+import { Ranking } from './pages/ranking/ranking';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'quizzes', pathMatch: 'full' },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'moje-quizy/:id/edytuj', component: QuizEditor },
   { path: 'quiz/:id', component: QuizPlay },
   { path: 'quiz/:id/result', component: QuizResult },
+  { path: 'quiz/:id/ranking', component: Ranking },
   { path: '**', redirectTo: 'quizzes' },
 ];

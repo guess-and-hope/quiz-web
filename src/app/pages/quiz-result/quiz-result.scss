@@ -125,6 +125,42 @@
   font-weight: 700;
 }
 
+.quiz-result__ranking-link {
+  display: inline-block;
+  margin-top: 0.85rem;
+  padding: 0.5rem 1.25rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+  background: var(--pink);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  &:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+}
+
+.quiz-result__save-error {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--red);
+}
+
 .quiz-result__list {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,46 @@
+@if (quizLoading()) {
+  <p class="ranking__status">Wczytywanie…</p>
+} @else if (quiz(); as quiz) {
+  <section class="ranking">
+    <header class="ranking__header">
+      <h2>{{ quiz.title }} — ranking</h2>
+      <p class="ranking__subtitle">Top 10 najlepszych wyników</p>
+    </header>
+
+    @if (loading()) {
+      <p class="ranking__status">Wczytywanie rankingu…</p>
+    } @else if (error()) {
+      <p class="ranking__status ranking__status--error">
+        Nie udało się wczytać rankingu: {{ error() }}
+      </p>
+    } @else if (entries().length === 0) {
+      <p class="ranking__status">
+        Nikt jeszcze nie zapisał wyniku dla tego quizu — bądź pierwszy!
+      </p>
+    } @else {
+      <ol class="ranking__list">
+        @for (entry of entries(); track $index) {
+          <li class="ranking__item" [class.ranking__item--me]="isMe(entry)">
+            <span class="ranking__rank">{{ $index + 1 }}</span>
+            <span class="ranking__name">
+              {{ entry.playerName }}
+              @if (isMe(entry)) {
+                <span class="ranking__badge">to Ty</span>
+              }
+            </span>
+            <span class="ranking__detail">{{ entry.correct }} / {{ entry.total }}</span>
+            <span class="ranking__score">{{ entry.percentage }}%</span>
+          </li>
+        }
+      </ol>
+    }
+
+    <div class="ranking__actions">
+      <a [routerLink]="['/quiz', quiz.id]">Rozwiąż quiz</a>
+      <a routerLink="/quizzes">Wróć do listy</a>
+    </div>
+  </section>
+} @else {
+  <p class="ranking__status">Nie znaleziono quizu.</p>
+  <a routerLink="/quizzes">Wróć do listy</a>
+}

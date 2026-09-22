@@ -37,6 +37,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+  margin-top: auto;
 }
 
 .my-quizzes__edit {
@@ -50,11 +51,6 @@
   text-transform: uppercase;
   letter-spacing: 0.02em;
   text-decoration: none;
-}
-
-.quiz-card {
-  position: relative;
-  padding-right: 3.5rem;
 }
 
 .my-quizzes__delete-icon {
