@@ -21,6 +21,32 @@
   }
 }
 
+.app-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem auto 0;
+}
+
+.app-nav__link {
+  padding: 0.5rem 1.25rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+
+  &--active {
+    background: var(--pink);
+    color: #fff;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+}
+
 .app-main {
   padding: 1.5rem 1rem 3rem;
 }

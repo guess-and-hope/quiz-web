@@ -2,6 +2,15 @@
   <h1>{{ title() }}</h1>
 </header>
 
+<nav class="app-nav">
+  <a routerLink="/quizzes" routerLinkActive="app-nav__link--active" class="app-nav__link">
+    Dostępne quizy
+  </a>
+  <a routerLink="/moje-quizy" routerLinkActive="app-nav__link--active" class="app-nav__link">
+    Moje quizy
+  </a>
+</nav>
+
 <main class="app-main">
   <router-outlet />
 </main>
