@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
+import { UserQuizService } from '../../services/user-quiz.service';
 import { AttemptService } from '../../services/attempt.service';
 import { ScoringService } from '../../services/scoring.service';
 import { PlayerIdentityService } from '../../services/player-identity.service';
@@ -23,6 +24,7 @@ export class QuizResult {
   readonly id = input.required<string>();
 
   private readonly quizService = inject(QuizService);
+  private readonly userQuizService = inject(UserQuizService);
   private readonly attemptService = inject(AttemptService);
   private readonly scoringService = inject(ScoringService);
   private readonly playerIdentity = inject(PlayerIdentityService);
@@ -31,7 +33,11 @@ export class QuizResult {
   protected readonly error = this.quizService.getError();
 
   private readonly quizzes = this.quizService.getAll();
-  protected readonly quiz = computed(() => this.quizzes().find((quiz) => quiz.id === this.id()));
+  protected readonly quiz = computed(
+    () =>
+      this.quizzes().find((quiz) => quiz.id === this.id()) ??
+      this.userQuizService.getAll()().find((quiz) => quiz.id === this.id()),
+  );
 
   private readonly attempt = this.attemptService.getAttempt();
   protected readonly hasAttempt = computed(() => this.attempt()?.quizId === this.id());

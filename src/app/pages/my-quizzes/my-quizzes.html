@@ -1,0 +1,71 @@
+<section class="quiz-list">
+  <div class="my-quizzes__header">
+    <h2>Moje quizy</h2>
+    <a routerLink="/moje-quizy/nowy" class="my-quizzes__add">+ Dodaj quiz</a>
+  </div>
+
+  @if (quizzes().length === 0) {
+    <p class="quiz-list__status">
+      Nie masz jeszcze żadnych własnych quizów. Kliknij „+ Dodaj quiz", żeby stworzyć pierwszy.
+    </p>
+  } @else {
+    <ul class="quiz-cards">
+      @for (quiz of quizzes(); track quiz.id) {
+        <li class="quiz-card">
+          <button
+            type="button"
+            class="my-quizzes__delete-icon"
+            (click)="confirmDelete(quiz)"
+            aria-label="Usuń quiz"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+              <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+
+          <div class="quiz-card__info">
+            <h3>{{ quiz.title }}</h3>
+            @if (quiz.category) {
+              <span class="quiz-card__category">{{ quiz.category }}</span>
+            }
+            <p class="quiz-card__count">{{ quiz.questions.length }} pytań</p>
+          </div>
+          <div class="my-quizzes__actions">
+            <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">Rozwiąż</button>
+            <a [routerLink]="['/moje-quizy', quiz.id, 'edytuj']" class="my-quizzes__edit">Edytuj</a>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (pendingDelete(); as quiz) {
+    <div class="my-quizzes__overlay" (click)="cancelDelete()">
+      <div class="my-quizzes__dialog" (click)="$event.stopPropagation()">
+        <h3>Usunąć quiz?</h3>
+        <p>Na pewno chcesz usunąć „{{ quiz.title }}"? Tej operacji nie można cofnąć.</p>
+        <div class="my-quizzes__dialog-actions">
+          <button type="button" class="my-quizzes__dialog-cancel" (click)="cancelDelete()">
+            Anuluj
+          </button>
+          <button type="button" class="my-quizzes__dialog-confirm" (click)="deleteConfirmed()">
+            Usuń
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

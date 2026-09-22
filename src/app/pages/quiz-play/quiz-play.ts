@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
+import { UserQuizService } from '../../services/user-quiz.service';
 import { AttemptService } from '../../services/attempt.service';
 import { QuizQuestion } from '../../components/quiz-question/quiz-question';
 import { AnswerValue } from '../../models';
@@ -15,6 +16,7 @@ export class QuizPlay {
   readonly id = input.required<string>();
 
   private readonly quizService = inject(QuizService);
+  private readonly userQuizService = inject(UserQuizService);
   private readonly attemptService = inject(AttemptService);
   private readonly router = inject(Router);
 
@@ -22,7 +24,11 @@ export class QuizPlay {
   protected readonly loading = this.quizService.isLoading();
   protected readonly error = this.quizService.getError();
 
-  protected readonly quiz = computed(() => this.quizzes().find((quiz) => quiz.id === this.id()));
+  protected readonly quiz = computed(
+    () =>
+      this.quizzes().find((quiz) => quiz.id === this.id()) ??
+      this.userQuizService.getAll()().find((quiz) => quiz.id === this.id()),
+  );
   protected readonly questions = computed(() => this.quiz()?.questions ?? []);
 
   protected readonly currentIndex = signal(0);

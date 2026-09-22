@@ -1,0 +1,130 @@
+<div class="quiz-editor">
+  <h2>{{ editingId ? 'Edytuj quiz' : 'Nowy quiz' }}</h2>
+
+  <div class="quiz-editor__field">
+    <label for="qe-title">Tytuł*</label>
+    <input id="qe-title" type="text" [(ngModel)]="title" placeholder="Np. Stolice świata" />
+  </div>
+
+  <div class="quiz-editor__field">
+    <label for="qe-category">Kategoria</label>
+    <input id="qe-category" type="text" [(ngModel)]="category" placeholder="Np. Geografia" />
+  </div>
+
+  <div class="quiz-editor__field">
+    <label for="qe-description">Opis</label>
+    <input id="qe-description" type="text" [(ngModel)]="description" placeholder="Krótki opis quizu" />
+  </div>
+
+  <div class="quiz-editor__questions">
+    @for (question of questions; track question.id; let i = $index) {
+      <div class="quiz-editor__question">
+        <div class="quiz-editor__question-header">
+          <span class="quiz-editor__question-number">Pytanie {{ i + 1 }}</span>
+          <select
+            class="quiz-editor__type"
+            [(ngModel)]="question.type"
+            (ngModelChange)="onTypeChange(question)"
+          >
+            <option value="single">Jednokrotny wybór</option>
+            <option value="multi">Wielokrotny wybór</option>
+            <option value="boolean">Prawda / Fałsz</option>
+          </select>
+          <button
+            type="button"
+            class="quiz-editor__remove"
+            [disabled]="questions.length <= 1"
+            (click)="removeQuestion(i)"
+          >
+            Usuń pytanie
+          </button>
+        </div>
+
+        <input
+          type="text"
+          class="quiz-editor__question-text"
+          placeholder="Treść pytania"
+          [(ngModel)]="question.text"
+        />
+
+        @if (question.type === 'boolean') {
+          <div class="quiz-editor__boolean">
+            <label class="quiz-editor__boolean-option">
+              <input
+                type="radio"
+                [name]="'correct-' + question.id"
+                [checked]="question.correctBoolean === true"
+                (change)="question.correctBoolean = true"
+              />
+              Prawda
+            </label>
+            <label class="quiz-editor__boolean-option">
+              <input
+                type="radio"
+                [name]="'correct-' + question.id"
+                [checked]="question.correctBoolean === false"
+                (change)="question.correctBoolean = false"
+              />
+              Fałsz
+            </label>
+          </div>
+        } @else {
+          <div class="quiz-editor__options">
+            @for (option of question.options; track $index; let oi = $index) {
+              <div class="quiz-editor__option">
+                @if (question.type === 'single') {
+                  <input
+                    type="radio"
+                    [name]="'correct-' + question.id"
+                    [checked]="question.correctSingle === oi"
+                    (change)="question.correctSingle = oi"
+                  />
+                } @else {
+                  <input type="checkbox" [(ngModel)]="question.correctMulti[oi]" />
+                }
+                <input
+                  type="text"
+                  class="quiz-editor__option-text"
+                  [placeholder]="'Odpowiedź ' + (oi + 1)"
+                  [(ngModel)]="question.options[oi]"
+                />
+                <button
+                  type="button"
+                  class="quiz-editor__remove-option"
+                  [disabled]="question.options.length <= 2"
+                  (click)="removeOption(question, oi)"
+                  aria-label="Usuń odpowiedź"
+                >
+                  ✕
+                </button>
+              </div>
+            }
+            <button type="button" class="quiz-editor__add-option" (click)="addOption(question)">
+              + Dodaj opcję
+            </button>
+          </div>
+        }
+
+        <input
+          type="text"
+          class="quiz-editor__explanation"
+          placeholder="Wyjaśnienie (opcjonalnie)"
+          [(ngModel)]="question.explanation"
+        />
+      </div>
+    }
+  </div>
+
+  <button type="button" class="quiz-editor__add-question" (click)="addQuestion()">+ Dodaj pytanie</button>
+
+  @if (validationMessage) {
+    <p class="quiz-editor__validation">{{ validationMessage }}</p>
+  }
+
+  <div class="quiz-editor__actions">
+    <button type="button" class="quiz-editor__save" [disabled]="!canSave" (click)="save()">
+      Zapisz quiz
+    </button>
+    <a routerLink="/moje-quizy" class="quiz-editor__cancel">Anuluj</a>
+  </div>
+</div>
