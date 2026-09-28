@@ -27,7 +27,6 @@
             </svg>
             {{ elapsedText() }}
           </span>
-          <span class="quiz-play__progress">{{ progressText() }}</span>
         </div>
         <div class="quiz-play__progress-track" aria-hidden="true">
           @for (filled of progressSegments(); track $index) {
@@ -40,6 +39,7 @@
         <app-quiz-question
           [question]="question"
           [answer]="currentAnswer()"
+          [progress]="progressText()"
           (answerChange)="onAnswerChange($event)"
         />
       }

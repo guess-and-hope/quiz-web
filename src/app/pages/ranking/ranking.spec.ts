@@ -85,7 +85,7 @@ describe('Ranking', () => {
     expect(fixture.nativeElement.textContent).toContain('Nikt jeszcze nie zapisał wyniku');
   });
 
-  it('reorders entries by time when the "Wg czasu" toggle is clicked', async () => {
+  it('renders entries in the order returned by the service and shows the time', async () => {
     await TestBed.configureTestingModule({
       imports: [Ranking],
       providers: [
@@ -106,19 +106,14 @@ describe('Ranking', () => {
     fixture.detectChanges();
 
     const el: HTMLElement = fixture.nativeElement;
-    const namesInOrder = () =>
-      Array.from(el.querySelectorAll('.ranking__name')).map((n) => n.textContent?.trim().split('\n')[0]);
+    const namesInOrder = Array.from(el.querySelectorAll('.ranking__name')).map(
+      (n) => n.textContent?.trim().split('\n')[0],
+    );
 
-    // Domyślnie (wg wyniku) Kuba (90%) jest pierwszy.
-    expect(namesInOrder()[0]).toContain('Kuba');
-
-    const timeButton = Array.from(el.querySelectorAll('button')).find(
-      (b) => b.textContent?.trim() === 'Wg czasu',
-    )!;
-    timeButton.click();
-    fixture.detectChanges();
-
-    // Po przełączeniu na czas Asia (45s) wyprzedza Kubę (120s).
-    expect(namesInOrder()[0]).toContain('Asia');
+    // Kolejność (wynik, potem czas) jest już ustalona po stronie zapytania.
+    expect(namesInOrder[0]).toContain('Kuba');
+    expect(namesInOrder[1]).toContain('Asia');
+    expect(el.textContent).toContain('2:00');
+    expect(el.textContent).toContain('0:45');
   });
 });

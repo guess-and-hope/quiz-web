@@ -10,6 +10,7 @@ import { AnswerValue, Question } from '../../models';
 export class QuizQuestion {
   readonly question = input.required<Question>();
   readonly answer = input<AnswerValue | undefined>(undefined);
+  readonly progress = input('');
   readonly answerChange = output<AnswerValue>();
 
   protected readonly options = computed(() => {

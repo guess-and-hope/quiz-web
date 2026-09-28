@@ -53,19 +53,13 @@
 .quiz-play__header-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.25rem 1rem;
 
   h2 {
     font-size: clamp(1.1rem, 3vw, 1.4rem);
   }
-}
-
-.quiz-play__progress {
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--ink);
 }
 
 .quiz-play__timer {

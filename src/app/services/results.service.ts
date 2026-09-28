@@ -58,8 +58,9 @@ export class ResultsService {
 
   /**
    * Ranking najlepszych wyników dla danego quizu: najlepszy wynik na osobę,
-   * malejąco (procent → trafienia → najwcześniejszy czas). Deduplikacja po
-   * `device_id`, a przy jego braku po nicku. Zwraca do `limit` pozycji.
+   * malejąco (procent → trafienia → czas ukończenia, krócej = wyżej →
+   * najwcześniejszy czas zapisu). Deduplikacja po `device_id`, a przy jego
+   * braku po nicku. Zwraca do `limit` pozycji.
    */
   async topForQuiz(
     quizId: string,
@@ -71,6 +72,7 @@ export class ResultsService {
       .eq('quiz_id', quizId)
       .order('percentage', { ascending: false })
       .order('correct', { ascending: false })
+      .order('duration_seconds', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: true })
       .limit(RANKING_FETCH_LIMIT);
 
