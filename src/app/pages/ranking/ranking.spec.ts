@@ -20,6 +20,7 @@ const entries: RankingEntry[] = [
     correct: 9,
     total: 10,
     percentage: 90,
+    durationSeconds: 120,
     createdAt: '2026-01-01T00:00:00.000Z',
   },
   {
@@ -28,6 +29,7 @@ const entries: RankingEntry[] = [
     correct: 8,
     total: 10,
     percentage: 80,
+    durationSeconds: 45,
     createdAt: '2026-01-02T00:00:00.000Z',
   },
 ];
@@ -81,5 +83,37 @@ describe('Ranking', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Nikt jeszcze nie zapisał wyniku');
+  });
+
+  it('renders entries in the order returned by the service and shows the time', async () => {
+    await TestBed.configureTestingModule({
+      imports: [Ranking],
+      providers: [
+        provideRouter([]),
+        provideQuizServiceStub([quiz]),
+        {
+          provide: ResultsService,
+          useValue: { topForQuiz: async () => ({ entries, error: null }) },
+        },
+      ],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(Ranking);
+    fixture.componentRef.setInput('id', 'geografia');
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    const namesInOrder = Array.from(el.querySelectorAll('.ranking__name')).map(
+      (n) => n.textContent?.trim().split('\n')[0],
+    );
+
+    // Ordering (score, then time) is already handled by the query.
+    expect(namesInOrder[0]).toContain('Kuba');
+    expect(namesInOrder[1]).toContain('Asia');
+    expect(el.textContent).toContain('2:00');
+    expect(el.textContent).toContain('0:45');
   });
 });

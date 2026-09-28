@@ -1,10 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { UserQuizService } from '../../services/user-quiz.service';
 import { AttemptService } from '../../services/attempt.service';
 import { QuizQuestion } from '../../components/quiz-question/quiz-question';
 import { AnswerValue } from '../../models';
+import { formatDuration } from '../../shared/format-duration';
 
 @Component({
   selector: 'app-quiz-play',
@@ -12,13 +13,25 @@ import { AnswerValue } from '../../models';
   templateUrl: './quiz-play.html',
   styleUrl: './quiz-play.scss',
 })
-export class QuizPlay {
+export class QuizPlay implements OnDestroy {
   readonly id = input.required<string>();
 
   private readonly quizService = inject(QuizService);
   private readonly userQuizService = inject(UserQuizService);
   private readonly attemptService = inject(AttemptService);
   private readonly router = inject(Router);
+
+  private readonly startedAt = Date.now();
+  private readonly timerHandle = setInterval(() => {
+    this.elapsedSeconds.set(Math.floor((Date.now() - this.startedAt) / 1000));
+  }, 1000);
+
+  protected readonly elapsedSeconds = signal(0);
+  protected readonly elapsedText = computed(() => formatDuration(this.elapsedSeconds()));
+
+  ngOnDestroy(): void {
+    clearInterval(this.timerHandle);
+  }
 
   private readonly quizzes = this.quizService.getAll();
   protected readonly loading = this.quizService.isLoading();
@@ -70,7 +83,9 @@ export class QuizPlay {
   }
 
   protected finish(): void {
-    this.attemptService.submit(this.id(), this.answers());
+    const durationSeconds = Math.floor((Date.now() - this.startedAt) / 1000);
+    clearInterval(this.timerHandle);
+    this.attemptService.submit(this.id(), this.answers(), durationSeconds);
     this.router.navigate(['/quiz', this.id(), 'result']);
   }
 }

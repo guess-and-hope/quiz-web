@@ -7,6 +7,7 @@ import { ScoringService } from '../../services/scoring.service';
 import { PlayerIdentityService } from '../../services/player-identity.service';
 import { ResultsService } from '../../services/results.service';
 import { AnswerValue, Question } from '../../models';
+import { formatDuration } from '../../shared/format-duration';
 
 interface QuestionReview {
   question: Question;
@@ -53,6 +54,11 @@ export class QuizResult {
     return this.scoringService.score(quiz, attempt.answers);
   });
 
+  protected readonly durationText = computed(() => {
+    const attempt = this.attempt();
+    return attempt && attempt.quizId === this.id() ? formatDuration(attempt.durationSeconds) : '';
+  });
+
   protected readonly reviews = computed<QuestionReview[]>(() => {
     const quiz = this.quiz();
     const attempt = this.attempt();
@@ -93,7 +99,8 @@ export class QuizResult {
     const name = this.nameDraft().trim();
     const quiz = this.quiz();
     const score = this.score();
-    if (!name || !quiz || !score || this.saving()) {
+    const attempt = this.attempt();
+    if (!name || !quiz || !score || !attempt || this.saving()) {
       return;
     }
 
@@ -109,6 +116,7 @@ export class QuizResult {
       correct: score.correct,
       total: score.total,
       percentage: score.percentage,
+      durationSeconds: attempt.durationSeconds,
     });
 
     this.saving.set(false);

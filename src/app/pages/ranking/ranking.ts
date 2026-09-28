@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { PlayerIdentityService } from '../../services/player-identity.service';
 import { RankingEntry, ResultsService } from '../../services/results.service';
+import { formatDuration } from '../../shared/format-duration';
 
 @Component({
   selector: 'app-ranking',
@@ -36,6 +37,10 @@ export class Ranking {
 
   protected isMe(entry: RankingEntry): boolean {
     return entry.deviceId !== null && entry.deviceId === this.deviceId;
+  }
+
+  protected formatTime(seconds: number | null): string {
+    return seconds === null ? '—' : formatDuration(seconds);
   }
 
   private async load(quizId: string): Promise<void> {

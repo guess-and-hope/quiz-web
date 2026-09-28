@@ -53,7 +53,7 @@
 .quiz-play__header-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.25rem 1rem;
 
@@ -62,10 +62,22 @@
   }
 }
 
-.quiz-play__progress {
+.quiz-play__timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 999px;
+  background: var(--yellow);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--ink);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .quiz-play__progress-track {

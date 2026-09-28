@@ -1,5 +1,10 @@
 <div class="quiz-question" role="group" [attr.aria-label]="question().text">
-  <p class="quiz-question__hint">{{ choiceHint() }}</p>
+  <div class="quiz-question__meta-row">
+    <p class="quiz-question__hint">{{ choiceHint() }}</p>
+    @if (progress()) {
+      <p class="quiz-question__progress">{{ progress() }}</p>
+    }
+  </div>
   <p class="quiz-question__text">{{ question().text }}</p>
 
   @switch (question().type) {

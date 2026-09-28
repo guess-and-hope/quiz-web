@@ -9,6 +9,7 @@ export interface QuizResultInput {
   correct: number;
   total: number;
   percentage: number;
+  durationSeconds: number;
 }
 
 export interface RankingEntry {
@@ -17,6 +18,7 @@ export interface RankingEntry {
   correct: number;
   total: number;
   percentage: number;
+  durationSeconds: number | null;
   createdAt: string;
 }
 
@@ -26,6 +28,7 @@ interface ResultsRow {
   correct: number;
   total: number;
   percentage: number;
+  duration_seconds: number | null;
   created_at: string;
 }
 
@@ -47,15 +50,18 @@ export class ResultsService {
       correct: result.correct,
       total: result.total,
       percentage: result.percentage,
+      duration_seconds: result.durationSeconds,
     });
 
     return { error: error ? error.message : null };
   }
 
   /**
-   * Ranking najlepszych wyników dla danego quizu: najlepszy wynik na osobę,
-   * malejąco (procent → trafienia → najwcześniejszy czas). Deduplikacja po
-   * `device_id`, a przy jego braku po nicku. Zwraca do `limit` pozycji.
+   * Top results for a given quiz: the best score per player, sorted
+   * descending (percentage → correct answers → completion time, faster
+   * ranks higher → earliest submission as the final tiebreaker).
+   * Deduplicated by `device_id`, falling back to nickname when it's
+   * missing. Returns up to `limit` entries.
    */
   async topForQuiz(
     quizId: string,
@@ -63,10 +69,11 @@ export class ResultsService {
   ): Promise<{ entries: RankingEntry[]; error: string | null }> {
     const { data, error } = await this.supabase.client
       .from('results')
-      .select('player_name, device_id, correct, total, percentage, created_at')
+      .select('player_name, device_id, correct, total, percentage, duration_seconds, created_at')
       .eq('quiz_id', quizId)
       .order('percentage', { ascending: false })
       .order('correct', { ascending: false })
+      .order('duration_seconds', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: true })
       .limit(RANKING_FETCH_LIMIT);
 
@@ -88,6 +95,7 @@ export class ResultsService {
         correct: row.correct,
         total: row.total,
         percentage: row.percentage,
+        durationSeconds: row.duration_seconds,
         createdAt: row.created_at,
       });
       if (entries.length >= limit) {

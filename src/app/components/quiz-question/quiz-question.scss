@@ -9,13 +9,29 @@
   box-shadow: 5px 5px 0 var(--ink);
 }
 
-.quiz-question__hint {
+.quiz-question__meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin: 0 0 0.4rem;
+}
+
+.quiz-question__hint {
+  margin: 0;
   font-weight: 700;
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #6b6553;
+}
+
+.quiz-question__progress {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 .quiz-question__text {

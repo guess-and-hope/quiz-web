@@ -15,6 +15,9 @@
         <p class="quiz-result__score">
           {{ score.correct }} / {{ score.total }} — {{ score.percentage }}%
         </p>
+        @if (durationText()) {
+          <p class="quiz-result__duration">Czas: {{ durationText() }}</p>
+        }
 
         <div class="quiz-result__save">
           @if (saved()) {

@@ -10,10 +10,18 @@ describe('AttemptService', () => {
   it('exposes the most recently submitted attempt', () => {
     const service = TestBed.inject(AttemptService);
 
-    service.submit('geografia', { 'geo-1': 1 });
-    expect(service.getAttempt()()).toEqual({ quizId: 'geografia', answers: { 'geo-1': 1 } });
+    service.submit('geografia', { 'geo-1': 1 }, 42);
+    expect(service.getAttempt()()).toEqual({
+      quizId: 'geografia',
+      answers: { 'geo-1': 1 },
+      durationSeconds: 42,
+    });
 
     service.submit('historia', { 'hist-1': true });
-    expect(service.getAttempt()()).toEqual({ quizId: 'historia', answers: { 'hist-1': true } });
+    expect(service.getAttempt()()).toEqual({
+      quizId: 'historia',
+      answers: { 'hist-1': true },
+      durationSeconds: 0,
+    });
   });
 });
