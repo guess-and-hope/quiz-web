@@ -4,7 +4,11 @@
     <a routerLink="/moje-quizy/nowy" class="my-quizzes__add">+ Dodaj quiz</a>
   </div>
 
-  @if (quizzes().length === 0) {
+  @if (loading()) {
+    <p class="quiz-list__status">Wczytywanie quizów…</p>
+  } @else if (error()) {
+    <p class="quiz-list__status quiz-list__status--error">{{ error() }}</p>
+  } @else if (quizzes().length === 0) {
     <p class="quiz-list__status">
       Nie masz jeszcze żadnych własnych quizów. Kliknij „+ Dodaj quiz", żeby stworzyć pierwszy.
     </p>
@@ -57,6 +61,9 @@
       <div class="my-quizzes__dialog" (click)="$event.stopPropagation()">
         <h3>Usunąć quiz?</h3>
         <p>Na pewno chcesz usunąć „{{ quiz.title }}"? Tej operacji nie można cofnąć.</p>
+        @if (deleteError()) {
+          <p class="my-quizzes__dialog-error">Nie udało się usunąć: {{ deleteError() }}</p>
+        }
         <div class="my-quizzes__dialog-actions">
           <button type="button" class="my-quizzes__dialog-cancel" (click)="cancelDelete()">
             Anuluj

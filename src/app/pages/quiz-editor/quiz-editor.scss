@@ -13,6 +13,15 @@
   }
 }
 
+.quiz-editor__status {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  text-align: center;
+  font-weight: 500;
+  color: #4a4636;
+}
+
 .quiz-editor__field {
   display: flex;
   flex-direction: column;

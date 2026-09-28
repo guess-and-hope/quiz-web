@@ -34,7 +34,9 @@ export class QuizPlay implements OnDestroy {
   }
 
   private readonly quizzes = this.quizService.getAll();
-  protected readonly loading = this.quizService.isLoading();
+  protected readonly loading = computed(
+    () => this.quizService.isLoading()() || this.userQuizService.isLoading()(),
+  );
   protected readonly error = this.quizService.getError();
 
   protected readonly quiz = computed(

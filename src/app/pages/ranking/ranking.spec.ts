@@ -4,6 +4,7 @@ import { Ranking } from './ranking';
 import { RankingEntry, ResultsService } from '../../services/results.service';
 import { Quiz } from '../../models';
 import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
+import { provideUserQuizServiceStub } from '../../testing/user-quiz-service.stub';
 
 const quiz: Quiz = {
   id: 'geografia',
@@ -41,6 +42,7 @@ describe('Ranking', () => {
       providers: [
         provideRouter([]),
         provideQuizServiceStub([quiz]),
+        provideUserQuizServiceStub(),
         {
           provide: ResultsService,
           useValue: { topForQuiz: async () => ({ entries, error: null }) },
@@ -68,6 +70,7 @@ describe('Ranking', () => {
       providers: [
         provideRouter([]),
         provideQuizServiceStub([quiz]),
+        provideUserQuizServiceStub(),
         {
           provide: ResultsService,
           useValue: { topForQuiz: async () => ({ entries: [], error: null }) },
@@ -91,6 +94,7 @@ describe('Ranking', () => {
       providers: [
         provideRouter([]),
         provideQuizServiceStub([quiz]),
+        provideUserQuizServiceStub(),
         {
           provide: ResultsService,
           useValue: { topForQuiz: async () => ({ entries, error: null }) },
