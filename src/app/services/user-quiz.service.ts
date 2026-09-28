@@ -51,7 +51,7 @@ export class UserQuizService {
     return this.errorSignal.asReadonly();
   }
 
-  /** UI-only ownership hint ("to Twój quiz") — nieegzekwowane przez RLS. */
+  /** UI-only ownership hint ("this is your quiz") — not enforced by RLS. */
   isMine(quizId: string): boolean {
     return this.ownerByQuizId()[quizId] === this.playerIdentity.getDeviceId();
   }

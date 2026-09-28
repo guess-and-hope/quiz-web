@@ -1,17 +1,17 @@
--- Quizy tworzone przez użytkowników — tabela `user_quizzes`
--- Uruchom w Supabase Studio -> SQL Editor. Skrypt jest idempotentny (mozna
--- uruchamiac wielokrotnie): tworzy tabele i wlacza RLS z publicznymi
--- politykami dostepu.
+-- User-created quizzes — `user_quizzes` table
+-- Run in Supabase Studio -> SQL Editor. The script is idempotent (safe to
+-- run multiple times): it creates the table and enables RLS with public
+-- access policies.
 --
--- Model "honorowy" (strona rozrywkowa, bez logowania), jak w `results.sql`,
--- ALE w odroznieniu od `results` (gdzie zapis to append-only log wynikow)
--- ta tabela jest z zalozenia edytowalna przez wlascicieli quizow — funkcja
--- "Moje quizy" (dodawanie/edycja/usuwanie) tego wymaga. Dlatego, inaczej niz
--- w results.sql, dopuszczamy tu rowniez UPDATE i DELETE z frontendu.
--- `device_id` (anonimowy identyfikator przegladarki z localStorage) sluzy
--- tylko do pokazania w UI "to Twoj quiz" (przyciski Edytuj/Usun) — RLS go
--- NIE weryfikuje, wiec to nie jest twarde zabezpieczenie, tylko umowa
--- spoleczna, zgodna z reszta aplikacji.
+-- "Honor mode" (an entertainment site, no login), same as `results.sql`,
+-- BUT unlike `results` (where writes are an append-only log of scores),
+-- this table is meant to be editable by quiz owners — the "Moje quizy"
+-- feature (add/edit/delete) requires it. That's why, unlike results.sql,
+-- we also allow UPDATE and DELETE from the frontend here.
+-- `device_id` (an anonymous browser identifier from localStorage) is only
+-- used to show "this is your quiz" in the UI (Edit/Delete buttons) — RLS
+-- does NOT verify it, so this isn't real enforcement, just a social
+-- contract, consistent with the rest of the app.
 
 create table if not exists public.user_quizzes (
   id          text primary key,
