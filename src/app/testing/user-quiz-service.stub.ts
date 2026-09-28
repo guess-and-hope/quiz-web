@@ -26,6 +26,7 @@ export function provideUserQuizServiceStub(initial: Quiz[] = [], mineIds: string
         title: draft.title,
         description: draft.description,
         category: draft.category,
+        categoryColor: draft.categoryColor,
         createdAt: now,
         updatedAt: now,
         questions: draft.questions,
@@ -43,6 +44,7 @@ export function provideUserQuizServiceStub(initial: Quiz[] = [], mineIds: string
                 title: draft.title,
                 description: draft.description,
                 category: draft.category,
+                categoryColor: draft.categoryColor,
                 questions: draft.questions,
                 updatedAt: new Date().toISOString(),
               }

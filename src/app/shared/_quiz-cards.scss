@@ -54,19 +54,44 @@
   }
 }
 
-.quiz-card:nth-child(3n + 1) .quiz-card__category {
+.quiz-card:nth-child(3n + 1) .quiz-card__category--auto {
   background: var(--teal);
   color: #fff;
 }
 
-.quiz-card:nth-child(3n + 2) .quiz-card__category {
+.quiz-card:nth-child(3n + 2) .quiz-card__category--auto {
   background: var(--pink);
   color: #fff;
 }
 
-.quiz-card:nth-child(3n + 3) .quiz-card__category {
+.quiz-card:nth-child(3n + 3) .quiz-card__category--auto {
   background: var(--green);
   color: #fff;
+}
+
+.quiz-card__category--teal {
+  background: var(--teal);
+  color: #fff;
+}
+
+.quiz-card__category--pink {
+  background: var(--pink);
+  color: #fff;
+}
+
+.quiz-card__category--green {
+  background: var(--green);
+  color: #fff;
+}
+
+.quiz-card__category--red {
+  background: var(--red);
+  color: #fff;
+}
+
+.quiz-card__category--yellow {
+  background: var(--yellow);
+  color: var(--ink);
 }
 
 .quiz-card__info {

@@ -46,4 +46,8 @@ export class MyQuizzes {
     }
     this.pendingDelete.set(null);
   }
+
+  protected categoryClass(quiz: Quiz): string {
+    return `quiz-card__category quiz-card__category--${quiz.categoryColor ?? 'auto'}`;
+  }
 }

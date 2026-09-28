@@ -14,15 +14,20 @@
 -- contract, consistent with the rest of the app.
 
 create table if not exists public.user_quizzes (
-  id          text primary key,
-  title       text not null,
-  description text,
-  category    text,
-  device_id   text not null,
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now(),
-  questions   jsonb not null default '[]'::jsonb
+  id             text primary key,
+  title          text not null,
+  description    text,
+  category       text,
+  category_color text,
+  device_id      text not null,
+  created_at     timestamptz not null default now(),
+  updated_at     timestamptz not null default now(),
+  questions      jsonb not null default '[]'::jsonb
 );
+
+-- Added after the table already existed in some environments — safe to
+-- rerun this whole script, `add column if not exists` is a no-op otherwise.
+alter table public.user_quizzes add column if not exists category_color text;
 
 alter table public.user_quizzes enable row level security;
 
