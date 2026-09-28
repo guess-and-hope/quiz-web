@@ -112,6 +112,7 @@ export class QuizEditor {
 
   protected readonly saving = signal(false);
   protected readonly saveError = signal<string | null>(null);
+  protected readonly colorPickerOpen = signal(false);
 
   constructor() {
     effect(() => {
@@ -143,6 +144,11 @@ export class QuizEditor {
 
   protected colorLabel(color: CategoryColor): string {
     return QuizEditor.COLOR_LABELS[color];
+  }
+
+  protected pickColor(color: CategoryColor | null): void {
+    this.categoryColor = color;
+    this.colorPickerOpen.set(false);
   }
 
   protected addQuestion(): void {
