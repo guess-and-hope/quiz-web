@@ -57,10 +57,11 @@ export class ResultsService {
   }
 
   /**
-   * Ranking najlepszych wyników dla danego quizu: najlepszy wynik na osobę,
-   * malejąco (procent → trafienia → czas ukończenia, krócej = wyżej →
-   * najwcześniejszy czas zapisu). Deduplikacja po `device_id`, a przy jego
-   * braku po nicku. Zwraca do `limit` pozycji.
+   * Top results for a given quiz: the best score per player, sorted
+   * descending (percentage → correct answers → completion time, faster
+   * ranks higher → earliest submission as the final tiebreaker).
+   * Deduplicated by `device_id`, falling back to nickname when it's
+   * missing. Returns up to `limit` entries.
    */
   async topForQuiz(
     quizId: string,

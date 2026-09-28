@@ -110,7 +110,7 @@ describe('Ranking', () => {
       (n) => n.textContent?.trim().split('\n')[0],
     );
 
-    // Kolejność (wynik, potem czas) jest już ustalona po stronie zapytania.
+    // Ordering (score, then time) is already handled by the query.
     expect(namesInOrder[0]).toContain('Kuba');
     expect(namesInOrder[1]).toContain('Asia');
     expect(el.textContent).toContain('2:00');
