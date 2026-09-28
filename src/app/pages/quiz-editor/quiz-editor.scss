@@ -43,6 +43,56 @@
   }
 }
 
+.quiz-editor__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.quiz-editor__color {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: var(--border-w) solid var(--ink);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &--selected {
+    box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink);
+  }
+
+  &--auto {
+    background:
+      linear-gradient(45deg, transparent 45%, var(--ink) 45%, var(--ink) 55%, transparent 55%),
+      #fff;
+  }
+
+  &--teal {
+    background: var(--teal);
+  }
+
+  &--pink {
+    background: var(--pink);
+  }
+
+  &--green {
+    background: var(--green);
+  }
+
+  &--red {
+    background: var(--red);
+  }
+
+  &--yellow {
+    background: var(--yellow);
+  }
+}
+
 .quiz-editor__questions {
   display: flex;
   flex-direction: column;

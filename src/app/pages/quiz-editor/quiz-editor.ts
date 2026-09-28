@@ -2,7 +2,7 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { QuizDraft, UserQuizService } from '../../services/user-quiz.service';
-import { Question, QuestionType } from '../../models';
+import { CATEGORY_COLORS, CategoryColor, Question, QuestionType } from '../../models';
 
 interface QuestionDraft {
   id: string;
@@ -100,10 +100,13 @@ export class QuizEditor {
   private readonly router = inject(Router);
 
   protected readonly quizLoading = this.userQuizService.isLoading();
+  protected readonly categoryColors = CATEGORY_COLORS;
+
   protected editingId: string | null = null;
   protected notFound = false;
   protected title = '';
   protected category = '';
+  protected categoryColor: CategoryColor | null = null;
   protected description = '';
   protected questions: QuestionDraft[] = [blankQuestion()];
 
@@ -121,12 +124,25 @@ export class QuizEditor {
         this.editingId = id;
         this.title = quiz.title;
         this.category = quiz.category ?? '';
+        this.categoryColor = quiz.categoryColor ?? null;
         this.description = quiz.description ?? '';
         this.questions = quiz.questions.map(toDraft);
       } else if (!this.userQuizService.isLoading()()) {
         this.notFound = true;
       }
     });
+  }
+
+  private static readonly COLOR_LABELS: Record<CategoryColor, string> = {
+    teal: 'Turkusowy',
+    pink: 'Różowy',
+    green: 'Zielony',
+    red: 'Czerwony',
+    yellow: 'Żółty',
+  };
+
+  protected colorLabel(color: CategoryColor): string {
+    return QuizEditor.COLOR_LABELS[color];
   }
 
   protected addQuestion(): void {
@@ -211,6 +227,7 @@ export class QuizEditor {
     const draft: QuizDraft = {
       title: this.title.trim(),
       category: this.category.trim() || undefined,
+      categoryColor: this.categoryColor ?? undefined,
       description: this.description.trim() || undefined,
       questions: this.questions.map(toQuestion),
     };

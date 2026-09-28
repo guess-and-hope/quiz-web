@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { UserQuizService } from '../../services/user-quiz.service';
+import { Quiz } from '../../models';
 
 @Component({
   selector: 'app-quiz-list',
@@ -24,5 +25,9 @@ export class QuizList {
 
   protected solve(quizId: string): void {
     this.router.navigate(['/quiz', quizId]);
+  }
+
+  protected categoryClass(quiz: Quiz): string {
+    return `quiz-card__category quiz-card__category--${quiz.categoryColor ?? 'auto'}`;
   }
 }

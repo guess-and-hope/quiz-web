@@ -43,7 +43,7 @@
           <div class="quiz-card__info">
             <h3>{{ quiz.title }}</h3>
             @if (quiz.category) {
-              <span class="quiz-card__category">{{ quiz.category }}</span>
+              <span [class]="categoryClass(quiz)">{{ quiz.category }}</span>
             }
             <p class="quiz-card__count">{{ quiz.questions.length }} pytań</p>
           </div>

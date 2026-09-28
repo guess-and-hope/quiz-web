@@ -18,6 +18,33 @@
   </div>
 
   <div class="quiz-editor__field">
+    <label>Kolor plakietki kategorii</label>
+    <div class="quiz-editor__colors">
+      <button
+        type="button"
+        class="quiz-editor__color quiz-editor__color--auto"
+        [class.quiz-editor__color--selected]="!categoryColor"
+        (click)="categoryColor = null"
+        aria-label="Automatycznie"
+        title="Automatycznie"
+      ></button>
+      @for (color of categoryColors; track color) {
+        <button
+          type="button"
+          [class]="
+            'quiz-editor__color quiz-editor__color--' +
+            color +
+            (categoryColor === color ? ' quiz-editor__color--selected' : '')
+          "
+          (click)="categoryColor = color"
+          [attr.aria-label]="colorLabel(color)"
+          [title]="colorLabel(color)"
+        ></button>
+      }
+    </div>
+  </div>
+
+  <div class="quiz-editor__field">
     <label for="qe-description">Opis</label>
     <input id="qe-description" type="text" [(ngModel)]="description" placeholder="Krótki opis quizu" />
   </div>
