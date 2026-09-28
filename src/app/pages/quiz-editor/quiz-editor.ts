@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, input } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { QuizDraft, UserQuizService } from '../../services/user-quiz.service';
@@ -93,32 +93,40 @@ function toQuestion(draft: QuestionDraft): Question {
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
 })
-export class QuizEditor implements OnInit {
+export class QuizEditor {
   readonly id = input<string>();
 
   private readonly userQuizService = inject(UserQuizService);
   private readonly router = inject(Router);
 
+  protected readonly quizLoading = this.userQuizService.isLoading();
   protected editingId: string | null = null;
+  protected notFound = false;
   protected title = '';
   protected category = '';
   protected description = '';
   protected questions: QuestionDraft[] = [blankQuestion()];
 
-  ngOnInit(): void {
-    const id = this.id();
-    if (!id) {
-      return;
-    }
-    const quiz = this.userQuizService.getById(id)();
-    if (!quiz) {
-      return;
-    }
-    this.editingId = id;
-    this.title = quiz.title;
-    this.category = quiz.category ?? '';
-    this.description = quiz.description ?? '';
-    this.questions = quiz.questions.map(toDraft);
+  protected readonly saving = signal(false);
+  protected readonly saveError = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const id = this.id();
+      if (!id || this.editingId) {
+        return;
+      }
+      const quiz = this.userQuizService.getById(id)();
+      if (quiz) {
+        this.editingId = id;
+        this.title = quiz.title;
+        this.category = quiz.category ?? '';
+        this.description = quiz.description ?? '';
+        this.questions = quiz.questions.map(toDraft);
+      } else if (!this.userQuizService.isLoading()()) {
+        this.notFound = true;
+      }
+    });
   }
 
   protected addQuestion(): void {
@@ -195,8 +203,8 @@ export class QuizEditor implements OnInit {
     return null;
   }
 
-  protected save(): void {
-    if (!this.canSave) {
+  protected async save(): Promise<void> {
+    if (!this.canSave || this.saving()) {
       return;
     }
 
@@ -207,11 +215,20 @@ export class QuizEditor implements OnInit {
       questions: this.questions.map(toQuestion),
     };
 
-    if (this.editingId) {
-      this.userQuizService.update(this.editingId, draft);
-    } else {
-      this.userQuizService.create(draft);
+    this.saving.set(true);
+    this.saveError.set(null);
+
+    const { error } = this.editingId
+      ? await this.userQuizService.update(this.editingId, draft)
+      : await this.userQuizService.create(draft);
+
+    this.saving.set(false);
+
+    if (error) {
+      this.saveError.set(error);
+      return;
     }
+
     this.router.navigate(['/moje-quizy']);
   }
 }

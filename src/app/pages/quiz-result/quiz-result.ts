@@ -32,7 +32,9 @@ export class QuizResult {
   private readonly playerIdentity = inject(PlayerIdentityService);
   private readonly resultsService = inject(ResultsService);
 
-  protected readonly loading = this.quizService.isLoading();
+  protected readonly loading = computed(
+    () => this.quizService.isLoading()() || this.userQuizService.isLoading()(),
+  );
   protected readonly error = this.quizService.getError();
 
   private readonly quizzes = this.quizService.getAll();

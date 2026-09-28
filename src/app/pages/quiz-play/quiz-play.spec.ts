@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { QuizPlay } from './quiz-play';
 import { Quiz } from '../../models';
 import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
+import { provideUserQuizServiceStub } from '../../testing/user-quiz-service.stub';
 
 const quiz: Quiz = {
   id: 'geografia',
@@ -19,7 +20,7 @@ describe('QuizPlay', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [QuizPlay],
-      providers: [provideRouter([]), provideQuizServiceStub([quiz])],
+      providers: [provideRouter([]), provideQuizServiceStub([quiz]), provideUserQuizServiceStub()],
     }).compileComponents();
   });
 

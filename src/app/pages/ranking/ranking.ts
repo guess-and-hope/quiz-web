@@ -1,6 +1,7 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
+import { UserQuizService } from '../../services/user-quiz.service';
 import { PlayerIdentityService } from '../../services/player-identity.service';
 import { RankingEntry, ResultsService } from '../../services/results.service';
 import { formatDuration } from '../../shared/format-duration';
@@ -15,12 +16,19 @@ export class Ranking {
   readonly id = input.required<string>();
 
   private readonly quizService = inject(QuizService);
+  private readonly userQuizService = inject(UserQuizService);
   private readonly resultsService = inject(ResultsService);
   private readonly playerIdentity = inject(PlayerIdentityService);
 
   private readonly quizzes = this.quizService.getAll();
-  protected readonly quizLoading = this.quizService.isLoading();
-  protected readonly quiz = computed(() => this.quizzes().find((quiz) => quiz.id === this.id()));
+  protected readonly quizLoading = computed(
+    () => this.quizService.isLoading()() || this.userQuizService.isLoading()(),
+  );
+  protected readonly quiz = computed(
+    () =>
+      this.quizzes().find((quiz) => quiz.id === this.id()) ??
+      this.userQuizService.getAll()().find((quiz) => quiz.id === this.id()),
+  );
 
   protected readonly entries = signal<RankingEntry[]>([]);
   protected readonly loading = signal(true);

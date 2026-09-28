@@ -1,4 +1,10 @@
 <div class="quiz-editor">
+  @if (id() && !editingId && !notFound) {
+    <p class="quiz-editor__status">Wczytywanie quizu…</p>
+  } @else if (notFound) {
+    <p class="quiz-editor__status">Nie znaleziono quizu.</p>
+    <a routerLink="/moje-quizy">Wróć do listy</a>
+  } @else {
   <h2>{{ editingId ? 'Edytuj quiz' : 'Nowy quiz' }}</h2>
 
   <div class="quiz-editor__field">
@@ -120,11 +126,15 @@
   @if (validationMessage) {
     <p class="quiz-editor__validation">{{ validationMessage }}</p>
   }
+  @if (saveError()) {
+    <p class="quiz-editor__validation">Nie udało się zapisać: {{ saveError() }}</p>
+  }
 
   <div class="quiz-editor__actions">
-    <button type="button" class="quiz-editor__save" [disabled]="!canSave" (click)="save()">
-      Zapisz quiz
+    <button type="button" class="quiz-editor__save" [disabled]="!canSave || saving()" (click)="save()">
+      {{ saving() ? 'Zapisywanie…' : 'Zapisz quiz' }}
     </button>
     <a routerLink="/moje-quizy" class="quiz-editor__cancel">Anuluj</a>
   </div>
+  }
 </div>

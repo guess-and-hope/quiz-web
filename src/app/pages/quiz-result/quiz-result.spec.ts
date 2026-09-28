@@ -4,6 +4,7 @@ import { QuizResult } from './quiz-result';
 import { AttemptService } from '../../services/attempt.service';
 import { Quiz } from '../../models';
 import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
+import { provideUserQuizServiceStub } from '../../testing/user-quiz-service.stub';
 
 const quiz: Quiz = {
   id: 'geografia',
@@ -33,7 +34,7 @@ describe('QuizResult', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [QuizResult],
-      providers: [provideRouter([]), provideQuizServiceStub([quiz])],
+      providers: [provideRouter([]), provideQuizServiceStub([quiz]), provideUserQuizServiceStub()],
     }).compileComponents();
   });
 

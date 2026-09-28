@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { UserQuizService, QuizDraft } from './user-quiz.service';
+import { SupabaseService } from './supabase.service';
 
 const draft: QuizDraft = {
   title: 'Mój quiz',
@@ -7,55 +8,93 @@ const draft: QuizDraft = {
   questions: [{ id: 'q1', type: 'boolean', text: 'Czy to działa?', correct: true }],
 };
 
+/** In-memory stand-in for the `user_quizzes` table, chainable like the real client. */
+function provideSupabaseStub() {
+  let rows: Record<string, unknown>[] = [];
+
+  return {
+    provide: SupabaseService,
+    useValue: {
+      client: {
+        from: () => ({
+          select: () => ({
+            order: () =>
+              Promise.resolve({
+                data: [...rows].sort((a, b) =>
+                  String(b['created_at']).localeCompare(String(a['created_at'])),
+                ),
+                error: null,
+              }),
+          }),
+          insert: (row: Record<string, unknown>) => {
+            rows.push(row);
+            return Promise.resolve({ error: null });
+          },
+          update: (patch: Record<string, unknown>) => ({
+            eq: (_column: string, id: string) => {
+              rows = rows.map((row) => (row['id'] === id ? { ...row, ...patch } : row));
+              return Promise.resolve({ error: null });
+            },
+          }),
+          delete: () => ({
+            eq: (_column: string, id: string) => {
+              rows = rows.filter((row) => row['id'] !== id);
+              return Promise.resolve({ error: null });
+            },
+          }),
+        }),
+      },
+    },
+  };
+}
+
 describe('UserQuizService', () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => localStorage.clear());
 
-  it('starts empty when localStorage has no user quizzes', () => {
+  it('starts empty and loads created quizzes', async () => {
+    TestBed.configureTestingModule({ providers: [provideSupabaseStub()] });
     const service = TestBed.inject(UserQuizService);
     expect(service.getAll()()).toEqual([]);
+
+    const { error } = await service.create(draft);
+
+    expect(error).toBeNull();
+    expect(service.getAll()().length).toBe(1);
+    expect(service.getAll()()[0].title).toBe('Mój quiz');
   });
 
-  it('creates a quiz, persists it and exposes it via getAll/getById', () => {
+  it('marks a freshly created quiz as mine', async () => {
+    TestBed.configureTestingModule({ providers: [provideSupabaseStub()] });
     const service = TestBed.inject(UserQuizService);
 
-    const created = service.create(draft);
+    await service.create(draft);
+    const created = service.getAll()()[0];
 
-    expect(service.getAll()()).toEqual([created]);
-    expect(service.getById(created.id)()).toEqual(created);
-
-    const stored = JSON.parse(localStorage.getItem('quiz.userQuizzes')!);
-    expect(stored).toEqual([created]);
+    expect(service.isMine(created.id)).toBe(true);
+    expect(service.isMine('inny-quiz')).toBe(false);
   });
 
-  it('updates an existing quiz in place', () => {
+  it('updates an existing quiz in place', async () => {
+    TestBed.configureTestingModule({ providers: [provideSupabaseStub()] });
     const service = TestBed.inject(UserQuizService);
-    const created = service.create(draft);
+    await service.create(draft);
+    const created = service.getAll()()[0];
 
-    service.update(created.id, { ...draft, title: 'Zmieniony tytuł' });
+    await service.update(created.id, { ...draft, title: 'Zmieniony tytuł' });
 
     const updated = service.getById(created.id)();
     expect(updated?.title).toBe('Zmieniony tytuł');
-    expect(updated?.createdAt).toBe(created.createdAt);
   });
 
-  it('deletes a quiz', () => {
+  it('deletes a quiz', async () => {
+    TestBed.configureTestingModule({ providers: [provideSupabaseStub()] });
     const service = TestBed.inject(UserQuizService);
-    const created = service.create(draft);
+    await service.create(draft);
+    const created = service.getAll()()[0];
 
-    service.delete(created.id);
+    await service.delete(created.id);
 
     expect(service.getAll()()).toEqual([]);
-  });
-
-  it('rehydrates quizzes from localStorage on a later inject', () => {
-    const first = TestBed.inject(UserQuizService);
-    first.create(draft);
-
-    TestBed.resetTestingModule();
-    const second = TestBed.inject(UserQuizService);
-
-    expect(second.getAll()().length).toBe(1);
-    expect(second.getAll()()[0].title).toBe('Mój quiz');
   });
 });

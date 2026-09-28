@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserQuizService } from '../../services/user-quiz.service';
 import { Quiz } from '../../models';
@@ -13,14 +13,20 @@ export class MyQuizzes {
   private readonly userQuizService = inject(UserQuizService);
   private readonly router = inject(Router);
 
-  protected readonly quizzes = this.userQuizService.getAll();
+  protected readonly loading = this.userQuizService.isLoading();
+  protected readonly error = this.userQuizService.getError();
+  protected readonly quizzes = computed(() =>
+    this.userQuizService.getAll()().filter((quiz) => this.userQuizService.isMine(quiz.id)),
+  );
   protected readonly pendingDelete = signal<Quiz | null>(null);
+  protected readonly deleteError = signal<string | null>(null);
 
   protected solve(id: string): void {
     this.router.navigate(['/quiz', id]);
   }
 
   protected confirmDelete(quiz: Quiz): void {
+    this.deleteError.set(null);
     this.pendingDelete.set(quiz);
   }
 
@@ -28,12 +34,16 @@ export class MyQuizzes {
     this.pendingDelete.set(null);
   }
 
-  protected deleteConfirmed(): void {
+  protected async deleteConfirmed(): Promise<void> {
     const quiz = this.pendingDelete();
     if (!quiz) {
       return;
     }
-    this.userQuizService.delete(quiz.id);
+    const { error } = await this.userQuizService.delete(quiz.id);
+    if (error) {
+      this.deleteError.set(error);
+      return;
+    }
     this.pendingDelete.set(null);
   }
 }
