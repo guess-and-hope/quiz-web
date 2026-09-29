@@ -1,6 +1,111 @@
-<header class="app-header">
-  <h1>{{ title() }}</h1>
-</header>
+<div class="app-top">
+  <header class="app-header">
+    <h1>{{ title() }}</h1>
+  </header>
+
+  @if (isQuizzesPage()) {
+    <div
+      class="quiz-search"
+      [class.quiz-search--open]="searchOpen()"
+      (mouseenter)="openSearch()"
+      (mouseleave)="scheduleCloseSearch()"
+    >
+      <div
+        class="quiz-search__bar"
+        [class.quiz-search__bar--active]="quizSearch.hasActiveFilters()"
+        (click)="openSearch()"
+      >
+        <svg
+          class="quiz-search__glass"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          type="search"
+          class="quiz-search__input"
+          [ngModel]="quizSearch.searchTerm()"
+          (ngModelChange)="quizSearch.searchTerm.set($event)"
+          placeholder="Szukaj quizu po nazwie…"
+          aria-label="Szukaj quizu po nazwie"
+          (focus)="openSearch()"
+        />
+
+        <div class="quiz-search__panel">
+          <div class="quiz-search__badges">
+            @for (cat of categories; track cat.name) {
+              <button
+                type="button"
+                class="quiz-search__badge"
+                [class]="'quiz-search__badge--' + cat.color"
+                [class.quiz-search__badge--selected]="quizSearch.isCategorySelected(cat.name)"
+                [attr.aria-pressed]="quizSearch.isCategorySelected(cat.name)"
+                (click)="quizSearch.toggleCategory(cat.name)"
+              >
+                <app-category-icon [icon]="cat.icon" />
+                {{ cat.name }}
+              </button>
+            }
+          </div>
+
+          @if (quizSearch.hasActiveFilters()) {
+            <button type="button" class="quiz-search__clear" (click)="quizSearch.clear()">
+              Wyczyść filtry
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+@if (isQuizzesPage()) {
+  <div class="quiz-search-mobile">
+    <div class="quiz-search-mobile__row">
+      <input
+        type="search"
+        class="quiz-search-mobile__input"
+        [ngModel]="quizSearch.searchTerm()"
+        (ngModelChange)="quizSearch.searchTerm.set($event)"
+        placeholder="Szukaj quizu po nazwie…"
+        aria-label="Szukaj quizu po nazwie"
+        (click)="engageMobileSearch()"
+        (focus)="engageMobileSearch()"
+      />
+    </div>
+
+    @if (mobileSearchEngaged() || quizSearch.hasActiveFilters()) {
+      <div class="quiz-search__badges">
+        @for (cat of categories; track cat.name) {
+          <button
+            type="button"
+            class="quiz-search__badge"
+            [class]="'quiz-search__badge--' + cat.color"
+            [class.quiz-search__badge--selected]="quizSearch.isCategorySelected(cat.name)"
+            [attr.aria-pressed]="quizSearch.isCategorySelected(cat.name)"
+            (click)="quizSearch.toggleCategory(cat.name)"
+          >
+            <app-category-icon [icon]="cat.icon" />
+            {{ cat.name }}
+          </button>
+        }
+      </div>
+
+      @if (quizSearch.hasActiveFilters()) {
+        <button type="button" class="quiz-search__clear" (click)="quizSearch.clear()">
+          Wyczyść filtry
+        </button>
+      }
+    }
+  </div>
+}
 
 <nav class="app-nav">
   <a routerLink="/quizzes" routerLinkActive="app-nav__link--active" class="app-nav__link">
