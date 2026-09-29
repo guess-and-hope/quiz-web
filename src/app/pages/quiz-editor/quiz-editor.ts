@@ -5,6 +5,7 @@ import { QuizDraft, UserQuizService } from '../../services/user-quiz.service';
 import { AiQuizService, QuizDifficulty } from '../../services/ai-quiz.service';
 import { CATEGORIES, Question, QuestionType } from '../../models';
 import { CategoryIcon } from '../../shared/category-icon/category-icon';
+import { AppSelect } from '../../components/app-select/app-select';
 
 interface QuestionDraft {
   id: string;
@@ -91,7 +92,7 @@ function toQuestion(draft: QuestionDraft): Question {
 
 @Component({
   selector: 'app-quiz-editor',
-  imports: [FormsModule, RouterLink, CategoryIcon],
+  imports: [FormsModule, RouterLink, CategoryIcon, AppSelect],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
 })
@@ -104,6 +105,18 @@ export class QuizEditor {
 
   protected readonly quizLoading = this.userQuizService.isLoading();
   protected readonly categories = CATEGORIES;
+
+  protected readonly difficulties: { value: QuizDifficulty; label: string }[] = [
+    { value: 'easy', label: 'Łatwy' },
+    { value: 'medium', label: 'Średni' },
+    { value: 'hard', label: 'Trudny' },
+  ];
+
+  protected readonly questionTypes: { value: QuestionType; label: string }[] = [
+    { value: 'single', label: 'Jednokrotny wybór' },
+    { value: 'multi', label: 'Wielokrotny wybór' },
+    { value: 'boolean', label: 'Prawda / Fałsz' },
+  ];
 
   protected editingId: string | null = null;
   protected notFound = false;
@@ -188,6 +201,18 @@ export class QuizEditor {
 
   protected removeQuestion(index: number): void {
     this.questions = this.questions.filter((_, i) => i !== index);
+  }
+
+  protected setDifficulty(value: string): void {
+    this.aiDifficulty = value as QuizDifficulty;
+  }
+
+  protected setQuestionType(question: QuestionDraft, type: string): void {
+    if (question.type === type) {
+      return;
+    }
+    question.type = type as QuestionType;
+    this.onTypeChange(question);
   }
 
   protected onTypeChange(question: QuestionDraft): void {

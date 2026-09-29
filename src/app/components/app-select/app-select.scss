@@ -1,0 +1,133 @@
+:host {
+  position: relative;
+  display: inline-block;
+}
+
+.app-select__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 8rem;
+  padding: 0.55rem 0.85rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.6rem;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+
+  &:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  &--open {
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+}
+
+.app-select__label {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-select__chevron {
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--ink);
+  transition: transform 0.15s ease;
+}
+
+.app-select__trigger--open .app-select__chevron {
+  transform: rotate(180deg);
+}
+
+.app-select__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.app-select__panel {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.35rem;
+  background: var(--paper);
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.7rem;
+  box-shadow: 4px 4px 0 var(--ink);
+  animation: app-select-pop 0.12s ease-out;
+}
+
+@keyframes app-select-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-select__option {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border: none;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.1s ease;
+
+  &:hover {
+    background: var(--yellow);
+  }
+
+  &--selected {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  &--selected:hover {
+    background: var(--ink);
+    color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-select__panel {
+    animation: none;
+  }
+  .app-select__chevron,
+  .app-select__trigger {
+    transition: none;
+  }
+}
