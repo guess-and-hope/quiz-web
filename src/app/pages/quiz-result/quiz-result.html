@@ -19,6 +19,34 @@
           <p class="quiz-result__duration">Czas: {{ durationText() }}</p>
         }
 
+        <div class="quiz-result__rating">
+          <span class="quiz-result__rating-label">Jak podobał Ci się ten quiz?</span>
+          <div class="quiz-result__rating-buttons">
+            <button
+              type="button"
+              class="quiz-result__rating-btn"
+              [class.quiz-result__rating-btn--active]="ratingSummary().myRating === 1"
+              [disabled]="rating()"
+              (click)="rate(1)"
+              aria-label="Podoba mi się"
+            >
+              <app-category-icon icon="thumb_up" />
+              <span>{{ ratingSummary().up }}</span>
+            </button>
+            <button
+              type="button"
+              class="quiz-result__rating-btn"
+              [class.quiz-result__rating-btn--active]="ratingSummary().myRating === -1"
+              [disabled]="rating()"
+              (click)="rate(-1)"
+              aria-label="Nie podoba mi się"
+            >
+              <app-category-icon icon="thumb_down" />
+              <span>{{ ratingSummary().down }}</span>
+            </button>
+          </div>
+        </div>
+
         <div class="quiz-result__save">
           @if (saved()) {
             <p class="quiz-result__save-confirm">Zapisano jako <strong>{{ playerName() }}</strong> ✓</p>
@@ -85,6 +113,59 @@
           </li>
         }
       </ol>
+
+      <section class="quiz-result__comments">
+        <h3 class="quiz-result__comments-title">Komentarze</h3>
+
+        <div class="quiz-result__comment-form">
+          <input
+            type="text"
+            class="quiz-result__name-input"
+            placeholder="Twoje imię"
+            [value]="commentNameDraft()"
+            (input)="onCommentNameInput($event)"
+            maxlength="24"
+          />
+          <textarea
+            class="quiz-result__comment-input"
+            placeholder="Podziel się opinią o quizie…"
+            rows="2"
+            [value]="commentDraft()"
+            (input)="onCommentInput($event)"
+            maxlength="500"
+          ></textarea>
+          <button
+            type="button"
+            class="quiz-result__save-btn"
+            [disabled]="!commentNameDraft().trim() || !commentDraft().trim() || commentSaving()"
+            (click)="addComment()"
+          >
+            {{ commentSaving() ? 'Wysyłanie…' : 'Dodaj komentarz' }}
+          </button>
+          @if (commentError()) {
+            <p class="quiz-result__save-error">Nie udało się dodać komentarza: {{ commentError() }}</p>
+          }
+        </div>
+
+        @if (commentsLoading()) {
+          <p class="quiz-result__comments-status">Wczytywanie komentarzy…</p>
+        } @else if (commentsLoadError()) {
+          <p class="quiz-result__comments-status quiz-result__comments-status--error">
+            Nie udało się wczytać komentarzy: {{ commentsLoadError() }}
+          </p>
+        } @else if (comments().length === 0) {
+          <p class="quiz-result__comments-status">Brak komentarzy — bądź pierwszy!</p>
+        } @else {
+          <ul class="quiz-result__comment-list">
+            @for (item of comments(); track $index) {
+              <li class="quiz-result__comment-item">
+                <p class="quiz-result__comment-author">{{ item.playerName }}</p>
+                <p class="quiz-result__comment-text">{{ item.comment }}</p>
+              </li>
+            }
+          </ul>
+        }
+      </section>
 
       <div class="quiz-result__actions">
         <a [routerLink]="['/quiz', quiz.id]">Rozwiąż ponownie</a>
