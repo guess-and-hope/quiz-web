@@ -7,6 +7,66 @@
   } @else {
   <h2>{{ editingId ? 'Edytuj quiz' : 'Nowy quiz' }}</h2>
 
+  <div class="quiz-editor__ai">
+    <h3 class="quiz-editor__ai-title">Generuj z AI</h3>
+    <p class="quiz-editor__ai-hint">
+      Podaj temat, a AI przygotuje wstępne pytania. Wygenerowanie nowych pytań zastąpi te już dodane.
+      Zawsze możesz je potem poprawić lub usunąć.
+    </p>
+    <div class="quiz-editor__ai-controls">
+      <input
+        type="text"
+        class="quiz-editor__ai-topic"
+        placeholder="Temat, np. Historia Polski"
+        [ngModel]="aiTopic"
+        (ngModelChange)="onAiTopicChange($event)"
+        [disabled]="aiLoading()"
+      />
+      <label class="quiz-editor__ai-inline">
+        Liczba
+        <input type="number" min="1" max="15" [(ngModel)]="aiCount" [disabled]="aiLoading()" />
+      </label>
+      <label class="quiz-editor__ai-inline">
+        Poziom
+        <select [(ngModel)]="aiDifficulty" [disabled]="aiLoading()">
+          <option value="easy">Łatwy</option>
+          <option value="medium">Średni</option>
+          <option value="hard">Trudny</option>
+        </select>
+      </label>
+      <button
+        type="button"
+        class="quiz-editor__ai-generate"
+        [disabled]="!aiTopic.trim() || aiLoading()"
+        (click)="generateWithAi()"
+      >
+        {{ aiLoading() ? 'Generuję…' : 'Generuj z AI' }}
+      </button>
+    </div>
+    @if (aiLoading()) {
+      <div class="ai-spinner" role="status" aria-label="Generowanie pytań przez AI">
+        <div class="ai-spinner__stage">
+          <div class="ai-spinner__card" aria-hidden="true">
+            <span class="ai-spinner__face ai-spinner__face--front">?</span>
+            <span class="ai-spinner__face ai-spinner__face--back">!</span>
+          </div>
+        </div>
+        <div class="ai-spinner__options" aria-hidden="true">
+          <span class="ai-spinner__opt" style="--i: 0">A</span>
+          <span class="ai-spinner__opt" style="--i: 1">B</span>
+          <span class="ai-spinner__opt" style="--i: 2">C</span>
+          <span class="ai-spinner__opt" style="--i: 3">D</span>
+        </div>
+        <p class="ai-spinner__caption">
+          AI układa Twoje pytania<span class="ai-spinner__dots"><i>.</i><i>.</i><i>.</i></span>
+        </p>
+      </div>
+    }
+    @if (aiError()) {
+      <p class="quiz-editor__ai-error">{{ aiError() }}</p>
+    }
+  </div>
+
   <div class="quiz-editor__field">
     <label for="qe-title">Tytuł*</label>
     <input id="qe-title" type="text" [(ngModel)]="title" placeholder="Np. Stolice świata" />
