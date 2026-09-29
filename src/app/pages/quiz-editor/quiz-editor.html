@@ -84,6 +84,7 @@
           [attr.aria-pressed]="category === cat.name"
           (click)="pickCategory(cat.name)"
         >
+          <app-category-icon [icon]="cat.icon" />
           {{ cat.name }}
         </button>
       }

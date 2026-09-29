@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { QuizDraft, UserQuizService } from '../../services/user-quiz.service';
 import { AiQuizService, QuizDifficulty } from '../../services/ai-quiz.service';
 import { CATEGORIES, Question, QuestionType } from '../../models';
+import { CategoryIcon } from '../../shared/category-icon/category-icon';
 
 interface QuestionDraft {
   id: string;
@@ -90,7 +91,7 @@ function toQuestion(draft: QuestionDraft): Question {
 
 @Component({
   selector: 'app-quiz-editor',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, CategoryIcon],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
 })

@@ -51,6 +51,9 @@
 }
 
 .quiz-editor__category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
   border: var(--border-w) solid var(--ink);
