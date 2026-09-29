@@ -3,10 +3,23 @@
   min-height: 100dvh;
 }
 
-.app-header {
-  width: fit-content;
-  max-width: calc(100% - 2rem);
+/* Grid, not flex: the empty first column mirrors the width the search icon takes in the
+   third column, so "Guess and Hope" in the middle column stays exactly page-centered
+   regardless of whether the icon is shown. */
+.app-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
   margin: 1rem auto 0;
+  max-width: calc(100% - 2rem);
+}
+
+.app-header {
+  grid-column: 2;
+  justify-self: center;
+  width: fit-content;
+  max-width: 100%;
   padding: 1rem 1.75rem;
   background: #fff;
   border: var(--border-w) solid var(--ink);
@@ -15,9 +28,185 @@
   text-align: center;
 
   h1 {
+    margin: 0;
     font-size: clamp(1.4rem, 4vw, 2rem);
     text-transform: uppercase;
     white-space: nowrap;
+  }
+}
+
+.quiz-search {
+  grid-column: 3;
+  justify-self: start;
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.quiz-search__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  height: 2.75rem;
+  padding: 0 0.65rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &--active {
+    background: var(--pink);
+    color: #fff;
+  }
+}
+
+.quiz-search__glass {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.quiz-search__input {
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  margin-left: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.9rem;
+  font-family: inherit;
+  opacity: 0;
+  transition:
+    width 0.25s ease,
+    margin-left 0.25s ease,
+    opacity 0.15s ease;
+
+  &::placeholder {
+    color: currentColor;
+    opacity: 0.65;
+  }
+}
+
+.quiz-search--open .quiz-search__input,
+.quiz-search__bar:focus-within .quiz-search__input {
+  width: 180px;
+  margin-left: 0.6rem;
+  opacity: 1;
+}
+
+.quiz-search__panel {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  width: max-content;
+  min-width: 260px;
+  max-width: min(320px, 90vw);
+  padding: 0.85rem;
+  background: var(--paper);
+  border: var(--border-w) solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0 var(--ink);
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0.12s;
+}
+
+.quiz-search--open .quiz-search__panel,
+.quiz-search:focus-within .quiz-search__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.quiz-search__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quiz-search__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: var(--border-w) solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+  }
+
+  &--selected {
+    color: #fff;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+}
+
+.quiz-search__badge--teal.quiz-search__badge--selected {
+  background: var(--teal);
+}
+
+.quiz-search__badge--pink.quiz-search__badge--selected {
+  background: var(--pink);
+}
+
+.quiz-search__badge--green.quiz-search__badge--selected {
+  background: var(--green);
+}
+
+.quiz-search__badge--red.quiz-search__badge--selected {
+  background: var(--red);
+}
+
+.quiz-search__badge--yellow.quiz-search__badge--selected {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+.quiz-search__clear {
+  align-self: flex-start;
+  padding: 0.35rem 0.8rem;
+  border: none;
+  background: none;
+  color: #6b6553;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ink);
   }
 }
 
@@ -51,9 +240,39 @@
   padding: 1.5rem 1rem 3rem;
 }
 
+/* Mobile alternative to the hover-to-expand search icon, which doesn't work on touch:
+   an always-visible search field plus a tap-to-open "Kategorie" toggle for the badges. */
+.quiz-search-mobile {
+  display: none;
+}
+
+.quiz-search-mobile__row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quiz-search-mobile__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.85rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-family: inherit;
+
+  &::placeholder {
+    color: #8a8368;
+  }
+}
+
 @media (max-width: 480px) {
+  .app-top {
+    margin-top: 0.75rem;
+  }
+
   .app-header {
-    margin: 0.75rem auto 0;
     padding: 0.85rem 1.1rem;
     border-radius: 1rem;
     box-shadow: 4px 4px 0 var(--ink);
@@ -61,5 +280,21 @@
 
   .app-header h1 {
     white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+  .quiz-search {
+    display: none;
+  }
+
+  .quiz-search-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    max-width: 420px;
+    margin: 1rem auto 0;
+    padding: 0 1rem;
   }
 }

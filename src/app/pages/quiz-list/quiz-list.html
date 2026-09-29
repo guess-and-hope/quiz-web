@@ -6,7 +6,13 @@
   } @else if (error()) {
     <p class="quiz-list__status quiz-list__status--error">{{ error() }}</p>
   } @else if (quizzes().length === 0) {
-    <p class="quiz-list__status">Brak dostępnych quizów.</p>
+    <p class="quiz-list__status">
+      @if (hasActiveFilters()) {
+        Brak quizów pasujących do wyszukiwania.
+      } @else {
+        Brak dostępnych quizów.
+      }
+    </p>
   } @else {
     <ul class="quiz-cards">
       @for (quiz of quizzes(); track quiz.id) {
@@ -57,7 +63,11 @@
     <p class="quiz-list__status quiz-list__status--error">{{ userQuizzesError() }}</p>
   } @else if (userQuizzes().length === 0) {
     <p class="quiz-list__status">
-      Nikt jeszcze nie dodał własnego quizu — zajrzyj do „Moje quizy", żeby dodać pierwszy!
+      @if (hasActiveFilters()) {
+        Brak quizów pasujących do wyszukiwania.
+      } @else {
+        Nikt jeszcze nie dodał własnego quizu — zajrzyj do „Moje quizy", żeby dodać pierwszy!
+      }
     </p>
   } @else {
     <ul class="quiz-cards">
