@@ -6,6 +6,7 @@ import { AiQuizService, QuizDifficulty } from '../../services/ai-quiz.service';
 import { CATEGORIES, Question, QuestionType } from '../../models';
 import { CategoryIcon } from '../../shared/category-icon/category-icon';
 import { AppSelect } from '../../components/app-select/app-select';
+import { Autosize } from '../../shared/autosize';
 
 interface QuestionDraft {
   id: string;
@@ -92,7 +93,7 @@ function toQuestion(draft: QuestionDraft): Question {
 
 @Component({
   selector: 'app-quiz-editor',
-  imports: [FormsModule, RouterLink, CategoryIcon, AppSelect],
+  imports: [FormsModule, RouterLink, CategoryIcon, AppSelect, Autosize],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
 })

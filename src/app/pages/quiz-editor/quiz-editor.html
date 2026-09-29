@@ -115,12 +115,13 @@
           </button>
         </div>
 
-        <input
-          type="text"
+        <textarea
           class="quiz-editor__question-text"
+          rows="1"
           placeholder="Treść pytania"
+          [appAutosize]="question.text"
           [(ngModel)]="question.text"
-        />
+        ></textarea>
 
         @if (question.type === 'boolean') {
           <div class="quiz-editor__boolean">
@@ -180,12 +181,13 @@
           </div>
         }
 
-        <input
-          type="text"
+        <textarea
           class="quiz-editor__explanation"
+          rows="1"
           placeholder="Wyjaśnienie (opcjonalnie)"
+          [appAutosize]="question.explanation"
           [(ngModel)]="question.explanation"
-        />
+        ></textarea>
       </div>
     }
   </div>

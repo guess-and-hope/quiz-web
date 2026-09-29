@@ -415,12 +415,16 @@
 
 .quiz-editor__question-text,
 .quiz-editor__explanation {
+  width: 100%;
   padding: 0.65rem 0.9rem;
   border: var(--border-w) solid var(--ink);
   border-radius: 0.75rem;
   background: #fff;
   font-family: inherit;
   font-size: 0.95rem;
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
 }
 
 .quiz-editor__explanation {
