@@ -2,6 +2,7 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { QuizDraft, UserQuizService } from '../../services/user-quiz.service';
+import { AiQuizService, QuizDifficulty } from '../../services/ai-quiz.service';
 import { CATEGORIES, Question, QuestionType } from '../../models';
 
 interface QuestionDraft {
@@ -97,6 +98,7 @@ export class QuizEditor {
   readonly id = input<string>();
 
   private readonly userQuizService = inject(UserQuizService);
+  private readonly aiQuizService = inject(AiQuizService);
   private readonly router = inject(Router);
 
   protected readonly quizLoading = this.userQuizService.isLoading();
@@ -110,6 +112,15 @@ export class QuizEditor {
 
   protected readonly saving = signal(false);
   protected readonly saveError = signal<string | null>(null);
+
+  protected aiTopic = '';
+  protected aiCount = 5;
+  protected aiDifficulty: QuizDifficulty = 'medium';
+  protected readonly aiLoading = signal(false);
+  protected readonly aiError = signal<string | null>(null);
+
+  // Tracks the title we last auto-filled from the topic, so we never clobber a title the user set themselves.
+  private titleFromTopic = '';
 
   constructor() {
     effect(() => {
@@ -131,6 +142,43 @@ export class QuizEditor {
 
   protected pickCategory(name: string): void {
     this.category = this.category === name ? '' : name;
+  }
+
+  protected onAiTopicChange(topic: string): void {
+    this.aiTopic = topic;
+    // Mirror the topic into the title, unless the user has typed their own title.
+    if (!this.title.trim() || this.title === this.titleFromTopic) {
+      this.title = topic.trim();
+      this.titleFromTopic = this.title;
+    }
+  }
+
+  protected async generateWithAi(): Promise<void> {
+    const topic = this.aiTopic.trim();
+    if (!topic || this.aiLoading()) {
+      return;
+    }
+
+    this.aiLoading.set(true);
+    this.aiError.set(null);
+    try {
+      const generated = await this.aiQuizService.generate({
+        topic,
+        count: this.aiCount,
+        difficulty: this.aiDifficulty,
+      });
+
+      // A fresh generation replaces any existing questions with the new draft.
+      this.questions = generated.map(toDraft);
+
+      if (!this.title.trim()) {
+        this.title = topic;
+      }
+    } catch (error) {
+      this.aiError.set(error instanceof Error ? error.message : 'Nie udało się wygenerować pytań.');
+    } finally {
+      this.aiLoading.set(false);
+    }
   }
 
   protected addQuestion(): void {
