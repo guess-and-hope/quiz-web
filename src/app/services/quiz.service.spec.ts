@@ -6,7 +6,6 @@ const rows = [
   {
     id: 'geografia',
     title: 'Geografia świata',
-    description: null,
     category: null,
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
@@ -15,7 +14,6 @@ const rows = [
   {
     id: 'historia',
     title: 'Historia',
-    description: 'Opis',
     category: 'Historia',
     created_at: '2026-01-02T00:00:00.000Z',
     updated_at: '2026-01-02T00:00:00.000Z',
@@ -54,7 +52,7 @@ describe('QuizService', () => {
 
     // mapowanie snake_case -> camelCase oraz null -> undefined
     const geografia = service.getById('geografia')();
-    expect(geografia?.description).toBeUndefined();
+    expect(geografia?.category).toBeUndefined();
     expect(geografia?.createdAt).toBe('2026-01-01T00:00:00.000Z');
     expect(service.getById('brak')()).toBeUndefined();
   });

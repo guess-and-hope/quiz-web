@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserQuizService } from '../../services/user-quiz.service';
-import { Quiz } from '../../models';
+import { Quiz, categoryColor } from '../../models';
 
 @Component({
   selector: 'app-my-quizzes',
@@ -48,6 +48,6 @@ export class MyQuizzes {
   }
 
   protected categoryClass(quiz: Quiz): string {
-    return `quiz-card__category quiz-card__category--${quiz.categoryColor ?? 'auto'}`;
+    return `quiz-card__category quiz-card__category--${categoryColor(quiz.category) ?? 'auto'}`;
   }
 }

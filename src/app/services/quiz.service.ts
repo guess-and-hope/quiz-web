@@ -5,7 +5,6 @@ import { SupabaseService } from './supabase.service';
 interface QuizRow {
   id: string;
   title: string;
-  description: string | null;
   category: string | null;
   created_at: string;
   updated_at: string;
@@ -27,7 +26,7 @@ export class QuizService {
   private async load(): Promise<void> {
     const { data, error } = await this.supabase.client
       .from('quizzes')
-      .select('id, title, description, category, created_at, updated_at, questions')
+      .select('id, title, category, created_at, updated_at, questions')
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -44,7 +43,6 @@ export class QuizService {
     return {
       id: row.id,
       title: row.title,
-      description: row.description ?? undefined,
       category: row.category ?? undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,

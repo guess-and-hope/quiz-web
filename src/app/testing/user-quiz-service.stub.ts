@@ -24,9 +24,7 @@ export function provideUserQuizServiceStub(initial: Quiz[] = [], mineIds: string
       const quiz: Quiz = {
         id: crypto.randomUUID(),
         title: draft.title,
-        description: draft.description,
         category: draft.category,
-        categoryColor: draft.categoryColor,
         createdAt: now,
         updatedAt: now,
         questions: draft.questions,
@@ -42,9 +40,7 @@ export function provideUserQuizServiceStub(initial: Quiz[] = [], mineIds: string
             ? {
                 ...quiz,
                 title: draft.title,
-                description: draft.description,
                 category: draft.category,
-                categoryColor: draft.categoryColor,
                 questions: draft.questions,
                 updatedAt: new Date().toISOString(),
               }
