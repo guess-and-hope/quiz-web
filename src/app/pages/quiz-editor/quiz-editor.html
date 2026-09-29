@@ -115,13 +115,20 @@
           </button>
         </div>
 
-        <textarea
-          class="quiz-editor__question-text"
-          rows="1"
-          placeholder="Treść pytania"
-          [appAutosize]="question.text"
-          [(ngModel)]="question.text"
-        ></textarea>
+        <div class="quiz-editor__block quiz-editor__block--question">
+          <label class="quiz-editor__block-label" [for]="'q-text-' + question.id">
+            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+            Treść pytania
+          </label>
+          <textarea
+            [id]="'q-text-' + question.id"
+            class="quiz-editor__question-text"
+            rows="1"
+            placeholder="O co chcesz zapytać?"
+            [appAutosize]="question.text"
+            [(ngModel)]="question.text"
+          ></textarea>
+        </div>
 
         @if (question.type === 'boolean') {
           <div class="quiz-editor__boolean">
@@ -181,13 +188,20 @@
           </div>
         }
 
-        <textarea
-          class="quiz-editor__explanation"
-          rows="1"
-          placeholder="Wyjaśnienie (opcjonalnie)"
-          [appAutosize]="question.explanation"
-          [(ngModel)]="question.explanation"
-        ></textarea>
+        <div class="quiz-editor__block quiz-editor__block--explanation">
+          <label class="quiz-editor__block-label" [for]="'q-expl-' + question.id">
+            <span class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
+            Wyjaśnienie <span class="quiz-editor__block-optional">(opcjonalnie)</span>
+          </label>
+          <textarea
+            [id]="'q-expl-' + question.id"
+            class="quiz-editor__explanation"
+            rows="1"
+            placeholder="Wyjaśnij, dlaczego to poprawna odpowiedź — pokażemy graczom po udzieleniu odpowiedzi."
+            [appAutosize]="question.explanation"
+            [(ngModel)]="question.explanation"
+          ></textarea>
+        </div>
       </div>
     }
   </div>

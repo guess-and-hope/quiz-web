@@ -413,6 +413,33 @@
   }
 }
 
+.quiz-editor__block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.quiz-editor__block-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  .material-symbols-outlined {
+    font-size: 1.05rem;
+  }
+}
+
+.quiz-editor__block-optional {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.75;
+}
+
 .quiz-editor__question-text,
 .quiz-editor__explanation {
   width: 100%;
@@ -425,6 +452,10 @@
   line-height: 1.4;
   resize: none;
   overflow: hidden;
+}
+
+.quiz-editor__question-text {
+  font-weight: 600;
 }
 
 .quiz-editor__explanation {
