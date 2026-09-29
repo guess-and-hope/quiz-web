@@ -169,6 +169,10 @@
 }
 
 .quiz-editor__ai-generate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   padding: 0.6rem 1.1rem;
   border: var(--border-w) solid var(--ink);
   border-radius: 0.6rem;
@@ -180,6 +184,10 @@
   letter-spacing: 0.02em;
   cursor: pointer;
   box-shadow: 3px 3px 0 var(--ink);
+
+  .material-symbols-outlined {
+    font-size: 1.1rem;
+  }
 
   &:disabled {
     background: #fff;

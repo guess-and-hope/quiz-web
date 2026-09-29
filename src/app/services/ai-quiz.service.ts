@@ -10,16 +10,18 @@ export interface GenerateQuizParams {
   difficulty: QuizDifficulty;
 }
 
-interface GenerateQuizResponse {
+export interface GenerateQuizResult {
   questions: Question[];
+  /** Best-matching category name chosen by the AI, if it returned one. */
+  category?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AiQuizService {
   private readonly supabase = inject(SupabaseService);
 
-  async generate(params: GenerateQuizParams): Promise<Question[]> {
-    const { data, error } = await this.supabase.client.functions.invoke<GenerateQuizResponse>(
+  async generate(params: GenerateQuizParams): Promise<GenerateQuizResult> {
+    const { data, error } = await this.supabase.client.functions.invoke<GenerateQuizResult>(
       'generate-quiz',
       { body: params },
     );
@@ -27,7 +29,7 @@ export class AiQuizService {
     if (error) {
       throw new Error(await this.extractError(error));
     }
-    return data?.questions ?? [];
+    return { questions: data?.questions ?? [], category: data?.category };
   }
 
   // Edge Function zwraca komunikat błędu w polu `error` (po polsku) — wyciągamy go

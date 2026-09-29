@@ -42,7 +42,8 @@
         [disabled]="!aiTopic.trim() || aiLoading()"
         (click)="generateWithAi()"
       >
-        {{ aiLoading() ? 'Generuję…' : 'Generuj z AI' }}
+        <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
+        {{ aiLoading() ? 'Generuję…' : 'Generuj' }}
       </button>
     </div>
     @if (aiLoading()) {
