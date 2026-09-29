@@ -26,14 +26,16 @@
         Liczba
         <input type="number" min="1" max="15" [(ngModel)]="aiCount" [disabled]="aiLoading()" />
       </label>
-      <label class="quiz-editor__ai-inline">
+      <div class="quiz-editor__ai-inline">
         Poziom
-        <select [(ngModel)]="aiDifficulty" [disabled]="aiLoading()">
-          <option value="easy">Łatwy</option>
-          <option value="medium">Średni</option>
-          <option value="hard">Trudny</option>
-        </select>
-      </label>
+        <app-select
+          [options]="difficulties"
+          [value]="aiDifficulty"
+          [disabled]="aiLoading()"
+          ariaLabel="Poziom trudności"
+          (valueChange)="setDifficulty($event)"
+        />
+      </div>
       <button
         type="button"
         class="quiz-editor__ai-generate"
@@ -96,15 +98,12 @@
       <div class="quiz-editor__question">
         <div class="quiz-editor__question-header">
           <span class="quiz-editor__question-number">Pytanie {{ i + 1 }}</span>
-          <select
-            class="quiz-editor__type"
-            [(ngModel)]="question.type"
-            (ngModelChange)="onTypeChange(question)"
-          >
-            <option value="single">Jednokrotny wybór</option>
-            <option value="multi">Wielokrotny wybór</option>
-            <option value="boolean">Prawda / Fałsz</option>
-          </select>
+          <app-select
+            [options]="questionTypes"
+            [value]="question.type"
+            ariaLabel="Typ pytania"
+            (valueChange)="setQuestionType(question, $event)"
+          />
           <button
             type="button"
             class="quiz-editor__remove"
