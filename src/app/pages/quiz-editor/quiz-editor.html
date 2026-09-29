@@ -13,49 +13,21 @@
   </div>
 
   <div class="quiz-editor__field">
-    <label for="qe-category">Kategoria</label>
-    <div class="quiz-editor__category-row">
-      <input id="qe-category" type="text" [(ngModel)]="category" placeholder="Np. Geografia" />
-      <button
-        type="button"
-        [class]="'quiz-editor__color-trigger quiz-editor__color--' + (categoryColor ?? 'auto')"
-        (click)="colorPickerOpen.set(!colorPickerOpen())"
-        aria-label="Wybierz kolor plakietki"
-        title="Wybierz kolor plakietki"
-      ></button>
-
-      @if (colorPickerOpen()) {
-        <div class="quiz-editor__color-popover-backdrop" (click)="colorPickerOpen.set(false)"></div>
-        <div class="quiz-editor__color-popover">
-          <button
-            type="button"
-            class="quiz-editor__color quiz-editor__color--auto"
-            [class.quiz-editor__color--selected]="!categoryColor"
-            (click)="pickColor(null)"
-            aria-label="Automatycznie"
-            title="Automatycznie"
-          ></button>
-          @for (color of categoryColors; track color) {
-            <button
-              type="button"
-              [class]="
-                'quiz-editor__color quiz-editor__color--' +
-                color +
-                (categoryColor === color ? ' quiz-editor__color--selected' : '')
-              "
-              (click)="pickColor(color)"
-              [attr.aria-label]="colorLabel(color)"
-              [title]="colorLabel(color)"
-            ></button>
-          }
-        </div>
+    <label>Kategoria</label>
+    <div class="quiz-editor__categories">
+      @for (cat of categories; track cat.name) {
+        <button
+          type="button"
+          class="quiz-editor__category-badge"
+          [class]="'quiz-editor__category-badge--' + cat.color"
+          [class.quiz-editor__category-badge--selected]="category === cat.name"
+          [attr.aria-pressed]="category === cat.name"
+          (click)="pickCategory(cat.name)"
+        >
+          {{ cat.name }}
+        </button>
       }
     </div>
-  </div>
-
-  <div class="quiz-editor__field">
-    <label for="qe-description">Opis</label>
-    <input id="qe-description" type="text" [(ngModel)]="description" placeholder="Krótki opis quizu" />
   </div>
 
   <div class="quiz-editor__questions">

@@ -1,22 +1,18 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
-import { CategoryColor, Question, Quiz } from '../models';
+import { Question, Quiz } from '../models';
 import { SupabaseService } from './supabase.service';
 import { PlayerIdentityService } from './player-identity.service';
 
 export interface QuizDraft {
   title: string;
-  description?: string;
   category?: string;
-  categoryColor?: CategoryColor;
   questions: Question[];
 }
 
 interface UserQuizRow {
   id: string;
   title: string;
-  description: string | null;
   category: string | null;
-  category_color: string | null;
   device_id: string;
   created_at: string;
   updated_at: string;
@@ -63,9 +59,7 @@ export class UserQuizService {
     const { error } = await this.supabase.client.from('user_quizzes').insert({
       id: crypto.randomUUID(),
       title: draft.title,
-      description: draft.description ?? null,
       category: draft.category ?? null,
-      category_color: draft.categoryColor ?? null,
       device_id: this.playerIdentity.getDeviceId(),
       created_at: now,
       updated_at: now,
@@ -84,9 +78,7 @@ export class UserQuizService {
       .from('user_quizzes')
       .update({
         title: draft.title,
-        description: draft.description ?? null,
         category: draft.category ?? null,
-        category_color: draft.categoryColor ?? null,
         questions: draft.questions,
         updated_at: new Date().toISOString(),
       })
@@ -114,9 +106,7 @@ export class UserQuizService {
 
     const { data, error } = await this.supabase.client
       .from('user_quizzes')
-      .select(
-        'id, title, description, category, category_color, device_id, created_at, updated_at, questions',
-      )
+      .select('id, title, category, device_id, created_at, updated_at, questions')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -136,9 +126,7 @@ export class UserQuizService {
     return {
       id: row.id,
       title: row.title,
-      description: row.description ?? undefined,
       category: row.category ?? undefined,
-      categoryColor: (row.category_color as CategoryColor | null) ?? undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       questions: row.questions,
