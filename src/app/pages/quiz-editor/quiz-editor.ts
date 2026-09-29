@@ -176,14 +176,19 @@ export class QuizEditor {
     this.aiLoading.set(true);
     this.aiError.set(null);
     try {
-      const generated = await this.aiQuizService.generate({
+      const result = await this.aiQuizService.generate({
         topic,
         count: this.aiCount,
         difficulty: this.aiDifficulty,
       });
 
       // A fresh generation replaces any existing questions with the new draft.
-      this.questions = generated.map(toDraft);
+      this.questions = result.questions.map(toDraft);
+
+      // Auto-select the category the AI matched, if it's one of our presets.
+      if (result.category && this.categories.some((cat) => cat.name === result.category)) {
+        this.category = result.category;
+      }
 
       if (!this.title.trim()) {
         this.title = topic;

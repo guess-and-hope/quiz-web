@@ -53,9 +53,31 @@ type Question =
   | { id: string; type: 'multi'; text: string; explanation?: string; options: string[]; correct: number[] }
   | { id: string; type: 'boolean'; text: string; explanation?: string; correct: boolean };
 
+// Musi odpowiadać liście kategorii w aplikacji (src/app/models/quiz.model.ts).
+// Model wybiera jedną z nich, a aplikacja auto-zaznacza pasującą plakietkę.
+const CATEGORY_NAMES = [
+  'Geografia',
+  'Historia',
+  'Nauka',
+  'Ogólna wiedza',
+  'Sport',
+  'Filmy i seriale',
+  'Muzyka',
+  'Literatura',
+  'Gry',
+  'Sztuka i kultura',
+  'Zwierzęta',
+  'Lifestyle',
+  'Technologia',
+  'Przyroda',
+  'Języki',
+  'Inne',
+];
+
 const responseSchema = {
   type: 'OBJECT',
   properties: {
+    category: { type: 'STRING', enum: CATEGORY_NAMES },
     questions: {
       type: 'ARRAY',
       items: {
@@ -72,7 +94,7 @@ const responseSchema = {
       },
     },
   },
-  required: ['questions'],
+  required: ['category', 'questions'],
 };
 
 const DIFFICULTY_PL: Record<Difficulty, string> = {
@@ -91,6 +113,7 @@ function buildPrompt(topic: string, count: number, difficulty: Difficulty): stri
     '- multi: options ma 3-5 odpowiedzi, correctIndexes zawiera co najmniej jeden (najlepiej kilka) indeksów poprawnych odpowiedzi, correctBoolean = false.',
     '- boolean: options pozostaw puste ([]), correctIndexes pozostaw puste ([]), correctBoolean to poprawna odpowiedź (true = prawda, false = fałsz).',
     'Indeksy w correctIndexes liczone są od 0. Pole explanation to krótkie wyjaśnienie poprawnej odpowiedzi.',
+    `Dobierz też jedną kategorię najlepiej pasującą do tematu z tej listy (użyj dokładnie takiej nazwy): ${CATEGORY_NAMES.join(', ')}. Zwróć ją w polu "category".`,
     'Nie powtarzaj pytań. Zwróć wyłącznie poprawny JSON zgodny ze schematem.',
   ].join('\n');
 }
@@ -226,7 +249,7 @@ Deno.serve(async (req) => {
     return json({ error: 'AI nie zwróciło żadnych pytań.', detail: String(detail) }, 502);
   }
 
-  let parsed: { questions?: RawQuestion[] };
+  let parsed: { questions?: RawQuestion[]; category?: string };
   try {
     parsed = JSON.parse(rawText);
   } catch {
@@ -241,5 +264,11 @@ Deno.serve(async (req) => {
     return json({ error: 'Nie udało się wygenerować poprawnych pytań. Spróbuj ponownie.' }, 422);
   }
 
-  return json({ questions }, 200);
+  // Zwracamy kategorię tylko, gdy jest jedną ze znanych — inaczej pomijamy (aplikacja jej nie zaznaczy).
+  const category =
+    typeof parsed.category === 'string' && CATEGORY_NAMES.includes(parsed.category)
+      ? parsed.category
+      : undefined;
+
+  return json({ questions, category }, 200);
 });
