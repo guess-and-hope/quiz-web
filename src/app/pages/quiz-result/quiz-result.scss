@@ -53,6 +53,54 @@
   color: #6b6553;
 }
 
+.quiz-result__rating {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quiz-result__rating-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #6b6553;
+}
+
+.quiz-result__rating-buttons {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.quiz-result__rating-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+
+  &:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  &--active {
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+}
+
 .quiz-result__save {
   margin-top: 1rem;
 }
@@ -211,6 +259,78 @@
   font-size: 0.85rem;
   color: #4a4636;
   font-style: italic;
+}
+
+.quiz-result__comments {
+  padding: 1.25rem;
+  background: var(--paper);
+  border: var(--border-w) solid var(--ink);
+  border-radius: 1.25rem;
+}
+
+.quiz-result__comments-title {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+}
+
+.quiz-result__comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-result__comment-input {
+  padding: 0.6rem 0.9rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+
+  &::placeholder {
+    color: #9a927e;
+  }
+}
+
+.quiz-result__comments-status {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b6553;
+
+  &--error {
+    color: var(--red);
+  }
+}
+
+.quiz-result__comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.quiz-result__comment-item {
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.75rem;
+}
+
+.quiz-result__comment-author {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.quiz-result__comment-text {
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 .quiz-result__actions {
