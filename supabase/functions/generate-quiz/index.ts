@@ -35,7 +35,14 @@ interface GenerateRequest {
   topic?: string;
   count?: number;
   difficulty?: Difficulty;
+  // Teksty istniejących pytań, których model NIE ma powtarzać ani parafrazować.
+  // Używane przy regeneracji pojedynczego pytania (re-roll), by nie zwrócić duplikatu.
+  avoid?: string[];
 }
+
+// Górny limit i przycięcie listy `avoid` — chronią rozmiar promptu przed rozdęciem.
+const MAX_AVOID = 30;
+const MAX_AVOID_LENGTH = 300;
 
 // Znormalizowany kształt, o który prosimy model — bez unii typów, dzięki czemu
 // schemat Gemini jest prosty, a całość walidujemy po stronie serwera.
@@ -103,8 +110,8 @@ const DIFFICULTY_PL: Record<Difficulty, string> = {
   hard: 'trudny',
 };
 
-function buildPrompt(topic: string, count: number, difficulty: Difficulty): string {
-  return [
+function buildPrompt(topic: string, count: number, difficulty: Difficulty, avoid: string[] = []): string {
+  const lines = [
     `Wygeneruj ${count} pytań quizowych po polsku na temat: "${topic}".`,
     `Poziom trudności: ${DIFFICULTY_PL[difficulty]}.`,
     'Użyj różnych typów pytań: single (jednokrotny wybór), multi (wielokrotny wybór), boolean (prawda/fałsz).',
@@ -114,8 +121,29 @@ function buildPrompt(topic: string, count: number, difficulty: Difficulty): stri
     '- boolean: options pozostaw puste ([]), correctIndexes pozostaw puste ([]), correctBoolean to poprawna odpowiedź (true = prawda, false = fałsz).',
     'Indeksy w correctIndexes liczone są od 0. Pole explanation to krótkie wyjaśnienie poprawnej odpowiedzi.',
     `Dobierz też jedną kategorię najlepiej pasującą do tematu z tej listy (użyj dokładnie takiej nazwy): ${CATEGORY_NAMES.join(', ')}. Zwróć ją w polu "category".`,
-    'Nie powtarzaj pytań. Zwróć wyłącznie poprawny JSON zgodny ze schematem.',
-  ].join('\n');
+  ];
+
+  // Przy re-rollu przekazujemy istniejące pytania, żeby model nie zwrócił duplikatu.
+  if (avoid.length > 0) {
+    const list = avoid.map((text) => `"${text}"`).join('; ');
+    lines.push(
+      `Nie powtarzaj ani nie parafrazuj następujących istniejących pytań: ${list}. Wygeneruj pytanie wyraźnie różne od nich.`,
+    );
+  }
+
+  lines.push('Nie powtarzaj pytań. Zwróć wyłącznie poprawny JSON zgodny ze schematem.');
+  return lines.join('\n');
+}
+
+// Czyści listę `avoid` z payloadu: odrzuca nie-stringi/puste, spłaszcza białe znaki,
+// przycina liczbę i długość elementów (ochrona rozmiaru promptu).
+function sanitizeAvoid(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((text) => (typeof text === 'string' ? text.replace(/\s+/g, ' ').trim() : ''))
+    .filter((text) => text.length > 0)
+    .slice(0, MAX_AVOID)
+    .map((text) => text.slice(0, MAX_AVOID_LENGTH));
 }
 
 // Mapuje znormalizowane pytanie z modelu na ścisły typ `Question`.
@@ -207,9 +235,10 @@ Deno.serve(async (req) => {
   const difficulty: Difficulty =
     payload.difficulty === 'easy' || payload.difficulty === 'hard' ? payload.difficulty : 'medium';
   const count = Math.min(Math.max(Math.floor(payload.count ?? 5) || 5, 1), MAX_QUESTIONS);
+  const avoid = sanitizeAvoid(payload.avoid);
 
   const requestBody = JSON.stringify({
-    contents: [{ parts: [{ text: buildPrompt(topic, count, difficulty) }] }],
+    contents: [{ parts: [{ text: buildPrompt(topic, count, difficulty, avoid) }] }],
     generationConfig: {
       responseMimeType: 'application/json',
       responseSchema,

@@ -17,6 +17,8 @@ interface QuestionDraft {
   correctSingle: number | null;
   correctMulti: boolean[];
   correctBoolean: boolean;
+  /** Tylko UI: opcjonalna wskazówka „o czym ma być to pytanie" przy re-rollu. Nie trafia do zapisu. */
+  aiHint: string;
 }
 
 function blankQuestion(): QuestionDraft {
@@ -29,11 +31,12 @@ function blankQuestion(): QuestionDraft {
     correctSingle: null,
     correctMulti: [false, false],
     correctBoolean: true,
+    aiHint: '',
   };
 }
 
 function toDraft(question: Question): QuestionDraft {
-  const base = { id: question.id, text: question.text, explanation: question.explanation ?? '' };
+  const base = { id: question.id, text: question.text, explanation: question.explanation ?? '', aiHint: '' };
 
   if (question.type === 'boolean') {
     return {
@@ -134,6 +137,10 @@ export class QuizEditor {
   protected readonly aiLoading = signal(false);
   protected readonly aiError = signal<string | null>(null);
 
+  // Re-roll pojedynczego pytania: id pytania w trakcie regeneracji (single-flight) i błąd per-pytanie.
+  protected readonly regeneratingId = signal<string | null>(null);
+  protected readonly regenError = signal<{ id: string; message: string } | null>(null);
+
   // Tracks the title we last auto-filled from the topic, so we never clobber a title the user set themselves.
   private titleFromTopic = '';
 
@@ -198,6 +205,56 @@ export class QuizEditor {
       this.aiError.set(error instanceof Error ? error.message : 'Nie udało się wygenerować pytań.');
     } finally {
       this.aiLoading.set(false);
+    }
+  }
+
+  // Regeneruje jedno pytanie w miejscu, nie ruszając pozostałych. Temat bierzemy z pola
+  // „o czym ma być to pytanie" (aiHint), a gdy puste — z tytułu quizu. Typ dobiera AI.
+  protected async regenerateQuestion(question: QuestionDraft): Promise<void> {
+    if (this.regeneratingId()) {
+      return;
+    }
+
+    const topic = question.aiHint.trim() || this.title.trim();
+    if (!topic) {
+      this.regenError.set({
+        id: question.id,
+        message: 'Podaj temat w polu obok albo uzupełnij tytuł quizu.',
+      });
+      return;
+    }
+
+    this.regeneratingId.set(question.id);
+    this.regenError.set(null);
+    try {
+      // Pozostałe pytania przekazujemy modelowi, żeby nie zwrócił duplikatu.
+      const avoid = this.questions
+        .filter((q) => q.id !== question.id)
+        .map((q) => q.text.trim())
+        .filter((text) => text.length > 0);
+
+      const fresh = await this.aiQuizService.regenerateQuestion({
+        topic,
+        difficulty: this.aiDifficulty,
+        avoid,
+      });
+
+      if (!fresh) {
+        this.regenError.set({ id: question.id, message: 'AI nie zwróciło pytania. Spróbuj ponownie.' });
+        return;
+      }
+
+      const draft = toDraft(fresh);
+      draft.id = question.id; // zachowujemy id slotu — stabilny track w @for i brak przeskoku fokusu
+      draft.aiHint = question.aiHint; // hint zostaje, by można było re-rollować ponownie
+      this.questions = this.questions.map((q) => (q.id === question.id ? draft : q));
+    } catch (error) {
+      this.regenError.set({
+        id: question.id,
+        message: error instanceof Error ? error.message : 'Nie udało się wygenerować pytania.',
+      });
+    } finally {
+      this.regeneratingId.set(null);
     }
   }
 

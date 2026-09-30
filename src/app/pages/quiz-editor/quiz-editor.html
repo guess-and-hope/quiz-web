@@ -11,7 +11,8 @@
     <h3 class="quiz-editor__ai-title">Generuj z AI</h3>
     <p class="quiz-editor__ai-hint">
       Podaj temat, a AI przygotuje wstępne pytania. Wygenerowanie nowych pytań zastąpi te już dodane.
-      Zawsze możesz je potem poprawić lub usunąć.
+      Zawsze możesz je potem poprawić, usunąć albo wygenerować pojedyncze pytanie od nowa
+      (przycisk przy każdym pytaniu).
     </p>
     <div class="quiz-editor__ai-controls">
       <input
@@ -201,6 +202,37 @@
             [appAutosize]="question.explanation"
             [(ngModel)]="question.explanation"
           ></textarea>
+        </div>
+
+        <div class="quiz-editor__block quiz-editor__block--regen">
+          <label class="quiz-editor__block-label" [for]="'q-hint-' + question.id">
+            <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
+            Wygeneruj to pytanie od nowa (AI)
+            <span class="quiz-editor__block-optional">(opcjonalnie)</span>
+          </label>
+          <div class="quiz-editor__question-regen">
+            <input
+              [id]="'q-hint-' + question.id"
+              type="text"
+              class="quiz-editor__question-hint"
+              placeholder="O czym ma być to pytanie? Puste = temat z tytułu quizu."
+              [(ngModel)]="question.aiHint"
+              [disabled]="regeneratingId() !== null"
+            />
+            <button
+              type="button"
+              class="quiz-editor__regen"
+              [disabled]="regeneratingId() !== null"
+              [attr.aria-busy]="regeneratingId() === question.id"
+              (click)="regenerateQuestion(question)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+              {{ regeneratingId() === question.id ? 'Generuję…' : 'Wygeneruj na nowo' }}
+            </button>
+          </div>
+          @if (regenError()?.id === question.id) {
+            <p class="quiz-editor__ai-error">{{ regenError()!.message }}</p>
+          }
         </div>
       </div>
     }

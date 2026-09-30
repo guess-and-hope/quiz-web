@@ -90,3 +90,25 @@ odpowiedzi), są odrzucane po stronie serwera.
   serwera), ale sam endpoint może być wołany bez konta. Naturalny następny krok:
   **rate limiting** w Edge Function (np. limit generowań na IP zapisywany w tabeli Supabase).
 - **Jakość po polsku bywa nierówna** — dlatego zostaje człowiek w pętli (przegląd przed zapisem).
+
+---
+
+## 6. Regeneracja pojedynczego pytania (re-roll)
+
+Generowanie wsadowe zastępuje **całą** listę pytań. Żeby poprawić jedno słabe pytanie bez
+utraty reszty, przy każdym pytaniu w edytorze jest przycisk **„Wygeneruj na nowo"**:
+
+- **Temat**: opcjonalne pole „o czym ma być to pytanie" przy danym pytaniu. Puste → temat =
+  **tytuł quizu**. Dzięki temu re-roll działa też przy edycji zapisanego quizu (panel AI pusty).
+- **Typ pytania dobiera AI** (single / multi / boolean) — tak jak przy generowaniu wsadowym.
+- **Bez duplikatów**: teksty pozostałych pytań lecą do funkcji w polu `avoid`, więc model nie
+  zwróci powtórki. Kategoria quizu **nie** jest przy re-rollu nadpisywana.
+- **Jedno na raz** (single-flight): w trakcie regeneracji przyciski są zablokowane — chroni to
+  darmowy limit Gemini.
+
+Technicznie re-roll woła **tę samą** Edge Function `generate-quiz` z `count: 1` i bierze pierwsze
+pytanie (`AiQuizService.regenerateQuestion(...)`) — brak nowego endpointu, jedno źródło walidacji.
+
+> **Uwaga o wdrożeniu:** pole `avoid` obsługuje zaktualizowana funkcja — po zmianie wykonaj
+> ponowny deploy: `npx supabase functions deploy generate-quiz --no-verify-jwt`. Do czasu
+> redeployu re-roll działa, ale bez deduplikacji (stara funkcja ignoruje nieznane pole).

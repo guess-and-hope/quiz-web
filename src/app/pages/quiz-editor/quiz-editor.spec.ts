@@ -4,6 +4,7 @@ import { QuizEditor } from './quiz-editor';
 import { MyQuizzes } from '../my-quizzes/my-quizzes';
 import { UserQuizService } from '../../services/user-quiz.service';
 import { provideUserQuizServiceStub } from '../../testing/user-quiz-service.stub';
+import { provideAiQuizServiceStub } from '../../testing/ai-quiz-service.stub';
 import { Quiz } from '../../models';
 
 describe('QuizEditor', () => {
@@ -89,5 +90,85 @@ describe('QuizEditor', () => {
     const service = TestBed.inject(UserQuizService);
     expect(service.getAll()().length).toBe(1);
     expect(service.getById(quiz.id)()?.title).toBe('Po edycji');
+  });
+
+  describe('regeneracja pojedynczego pytania', () => {
+    async function createEditor() {
+      const ai = provideAiQuizServiceStub();
+      await TestBed.configureTestingModule({
+        imports: [QuizEditor],
+        providers: [
+          provideRouter([{ path: 'moje-quizy', component: MyQuizzes }]),
+          provideUserQuizServiceStub(),
+          ai.provider,
+        ],
+      }).compileComponents();
+
+      const fixture = TestBed.createComponent(QuizEditor);
+      fixture.detectChanges();
+      return { fixture, component: fixture.componentInstance, control: ai.control };
+    }
+
+    it('podmienia tylko wskazane pytanie, resztę zostawia nietkniętą', async () => {
+      const { component, control } = await createEditor();
+      component['title'] = 'Historia Polski';
+      component['addQuestion']();
+      const firstId = component['questions'][0].id;
+      const secondId = component['questions'][1].id;
+      component['questions'][0].text = 'Pierwsze pytanie?';
+      component['questions'][1].text = 'Drugie pytanie?';
+      control.nextQuestion = { id: 'srv-new', type: 'single', text: 'Świeże pytanie?', options: ['A', 'B'], correct: 0 };
+
+      await component['regenerateQuestion'](component['questions'][0]);
+
+      expect(control.regenerateCalls).toBe(1);
+      expect(component['questions'][0].text).toBe('Świeże pytanie?');
+      expect(component['questions'][0].id).toBe(firstId); // id slotu zachowany
+      expect(component['questions'][1].text).toBe('Drugie pytanie?');
+      expect(component['questions'][1].id).toBe(secondId);
+    });
+
+    it('gdy pole wskazówki jest puste, tematem jest tytuł quizu', async () => {
+      const { component, control } = await createEditor();
+      component['title'] = 'Historia Polski';
+      component['questions'][0].aiHint = '';
+
+      await component['regenerateQuestion'](component['questions'][0]);
+
+      expect(control.lastRegenerateArgs?.topic).toBe('Historia Polski');
+    });
+
+    it('gdy wskazówka jest wpisana, staje się tematem pytania', async () => {
+      const { component, control } = await createEditor();
+      component['title'] = 'Historia Polski';
+      component['questions'][0].aiHint = 'Bitwa pod Grunwaldem';
+
+      await component['regenerateQuestion'](component['questions'][0]);
+
+      expect(control.lastRegenerateArgs?.topic).toBe('Bitwa pod Grunwaldem');
+    });
+
+    it('nie woła AI, gdy brak tytułu i wskazówki, i ustawia błąd przy pytaniu', async () => {
+      const { component, control } = await createEditor();
+      component['title'] = '';
+      component['questions'][0].aiHint = '';
+
+      await component['regenerateQuestion'](component['questions'][0]);
+
+      expect(control.regenerateCalls).toBe(0);
+      expect(component['regenError']()?.id).toBe(component['questions'][0].id);
+    });
+
+    it('przekazuje teksty pozostałych pytań jako `avoid` (bez bieżącego)', async () => {
+      const { component, control } = await createEditor();
+      component['title'] = 'Quiz';
+      component['addQuestion']();
+      component['questions'][0].text = 'Pierwsze?';
+      component['questions'][1].text = 'Drugie?';
+
+      await component['regenerateQuestion'](component['questions'][0]);
+
+      expect(control.lastRegenerateArgs?.avoid).toEqual(['Drugie?']);
+    });
   });
 });
