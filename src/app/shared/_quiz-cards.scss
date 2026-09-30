@@ -113,10 +113,31 @@
   text-transform: uppercase;
 }
 
+.quiz-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: auto;
+}
+
 .quiz-card__count {
   margin: 0;
   font-size: 0.85rem;
   font-weight: 500;
+  color: #6b6553;
+}
+
+.quiz-card__stats {
+  display: flex;
+  gap: 0.9rem;
+}
+
+.quiz-card__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: #6b6553;
 }
 
@@ -158,7 +179,6 @@
 
 .quiz-card__action {
   align-self: stretch;
-  margin-top: auto;
   padding: 0.6rem 1.25rem;
   border: var(--border-w) solid var(--ink);
   border-radius: 0.75rem;
