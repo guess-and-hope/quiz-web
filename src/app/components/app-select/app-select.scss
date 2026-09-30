@@ -35,6 +35,25 @@
   &--open {
     box-shadow: 2px 2px 0 var(--ink);
   }
+
+  /* Compact square icon-only trigger (e.g. the sort control in the quiz toolbar). */
+  &--icon {
+    min-width: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+    box-shadow: 3px 3px 0 var(--ink);
+
+    &:hover:not(:disabled) {
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    &.app-select__trigger--open {
+      background: var(--yellow);
+    }
+  }
 }
 
 .app-select__label {
@@ -80,6 +99,12 @@
   border-radius: 0.7rem;
   box-shadow: 4px 4px 0 var(--ink);
   animation: app-select-pop 0.12s ease-out;
+
+  /* Right-aligned menu for the narrow icon trigger, so it never spills off-screen. */
+  &--right {
+    left: auto;
+    right: 0;
+  }
 }
 
 @keyframes app-select-pop {

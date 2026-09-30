@@ -1,4 +1,5 @@
 import { Component, HostListener, computed, input, output, signal } from '@angular/core';
+import { CategoryIcon } from '../../shared/category-icon/category-icon';
 
 export interface SelectOption {
   value: string;
@@ -8,7 +9,7 @@ export interface SelectOption {
 /** Fancy custom dropdown that replaces the native <select> while keeping keyboard/ARIA basics. */
 @Component({
   selector: 'app-select',
-  imports: [],
+  imports: [CategoryIcon],
   templateUrl: './app-select.html',
   styleUrl: './app-select.scss',
 })
@@ -17,6 +18,8 @@ export class AppSelect {
   readonly value = input.required<string>();
   readonly disabled = input(false);
   readonly ariaLabel = input('');
+  /** When set, the trigger is a compact icon button (Material Symbol name) instead of a labelled one. */
+  readonly icon = input('');
   readonly valueChange = output<string>();
 
   protected readonly open = signal(false);

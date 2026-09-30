@@ -391,6 +391,6 @@ export class QuizEditor {
       return;
     }
 
-    this.router.navigate(['/moje-quizy']);
+    this.router.navigate(['/quizzes']);
   }
 }

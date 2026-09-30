@@ -5,10 +5,19 @@ import { Injectable, computed, signal } from '@angular/core';
 export class QuizSearchService {
   readonly searchTerm = signal('');
   readonly selectedCategories = signal<ReadonlySet<string>>(new Set());
+  /** When on, the list shows only quizzes owned by this browser. */
+  readonly mineOnly = signal(false);
 
   readonly hasActiveFilters = computed(
-    () => this.searchTerm().trim().length > 0 || this.selectedCategories().size > 0,
+    () =>
+      this.searchTerm().trim().length > 0 ||
+      this.selectedCategories().size > 0 ||
+      this.mineOnly(),
   );
+
+  toggleMineOnly(): void {
+    this.mineOnly.update((on) => !on);
+  }
 
   toggleCategory(name: string): void {
     const next = new Set(this.selectedCategories());
@@ -27,5 +36,6 @@ export class QuizSearchService {
   clear(): void {
     this.searchTerm.set('');
     this.selectedCategories.set(new Set());
+    this.mineOnly.set(false);
   }
 }

@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { UserQuizService } from '../../services/user-quiz.service';
@@ -8,7 +9,7 @@ import { ResultsService } from '../../services/results.service';
 import { CategoryIcon } from '../../shared/category-icon/category-icon';
 import { AppSelect, SelectOption } from '../../components/app-select/app-select';
 import { questionsLabel } from '../../shared/pluralize-pl';
-import { Quiz, categoryColor } from '../../models';
+import { CATEGORIES, Quiz, categoryColor } from '../../models';
 
 type SortOption = 'newest' | 'oldest' | 'title-asc' | 'title-desc' | 'likes-desc' | 'solves-desc';
 
@@ -23,14 +24,14 @@ const SORT_OPTIONS: SelectOption[] = [
 
 @Component({
   selector: 'app-quiz-list',
-  imports: [RouterLink, CategoryIcon, AppSelect],
+  imports: [FormsModule, RouterLink, CategoryIcon, AppSelect],
   templateUrl: './quiz-list.html',
   styleUrl: './quiz-list.scss',
 })
 export class QuizList {
   private readonly quizService = inject(QuizService);
   private readonly userQuizService = inject(UserQuizService);
-  private readonly quizSearch = inject(QuizSearchService);
+  protected readonly quizSearch = inject(QuizSearchService);
   private readonly feedbackService = inject(FeedbackService);
   private readonly resultsService = inject(ResultsService);
   private readonly router = inject(Router);
@@ -51,8 +52,18 @@ export class QuizList {
 
   protected readonly hasActiveFilters = this.quizSearch.hasActiveFilters;
 
+  protected readonly categories = CATEGORIES;
+  protected readonly filtersOpen = signal(false);
+  /** Category chips + "only mine" that live behind the filter toggle (the search term shows in the input). */
+  protected readonly activeFilterCount = computed(
+    () => this.quizSearch.selectedCategories().size + (this.quizSearch.mineOnly() ? 1 : 0),
+  );
+
   protected readonly sortOptions = SORT_OPTIONS;
   protected readonly sortBy = signal<SortOption>('newest');
+
+  protected readonly pendingDelete = signal<Quiz | null>(null);
+  protected readonly deleteError = signal<string | null>(null);
 
   private readonly likeCounts = signal<Record<string, number>>({});
   private readonly solveCounts = signal<Record<string, number>>({});
@@ -79,8 +90,38 @@ export class QuizList {
     return this.solveCounts()[quizId] ?? 0;
   }
 
+  protected isMine(quizId: string): boolean {
+    return this.userQuizService.isMine(quizId);
+  }
+
   protected setSortBy(value: string): void {
     this.sortBy.set(value as SortOption);
+  }
+
+  protected toggleFilters(): void {
+    this.filtersOpen.update((open) => !open);
+  }
+
+  protected confirmDelete(quiz: Quiz): void {
+    this.deleteError.set(null);
+    this.pendingDelete.set(quiz);
+  }
+
+  protected cancelDelete(): void {
+    this.pendingDelete.set(null);
+  }
+
+  protected async deleteConfirmed(): Promise<void> {
+    const quiz = this.pendingDelete();
+    if (!quiz) {
+      return;
+    }
+    const { error } = await this.userQuizService.delete(quiz.id);
+    if (error) {
+      this.deleteError.set(error);
+      return;
+    }
+    this.pendingDelete.set(null);
   }
 
   private async loadStats(quizIds: string[]): Promise<void> {
@@ -103,11 +144,14 @@ export class QuizList {
   private filter(quizzes: Quiz[]): Quiz[] {
     const term = this.quizSearch.searchTerm().trim().toLowerCase();
     const categories = this.quizSearch.selectedCategories();
+    const mineOnly = this.quizSearch.mineOnly();
 
     return quizzes.filter((quiz) => {
       const matchesTerm = !term || quiz.title.toLowerCase().includes(term);
-      const matchesCategory = categories.size === 0 || (!!quiz.category && categories.has(quiz.category));
-      return matchesTerm && matchesCategory;
+      const matchesCategory =
+        categories.size === 0 || (!!quiz.category && categories.has(quiz.category));
+      const matchesMine = !mineOnly || this.userQuizService.isMine(quiz.id);
+      return matchesTerm && matchesCategory && matchesMine;
     });
   }
 

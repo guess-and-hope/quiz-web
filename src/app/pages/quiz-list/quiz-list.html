@@ -1,15 +1,98 @@
 <section class="quiz-list">
-  <h2>Quizy</h2>
+  <h2 class="quiz-list__title">Quizy</h2>
 
-  <div class="quiz-list__controls">
-    <span class="quiz-list__sort-label" id="quiz-sort-label">Sortuj:</span>
+  <div class="quiz-toolbar">
+    <div class="quiz-search" [class.quiz-search--active]="quizSearch.hasActiveFilters()">
+      <svg
+        class="quiz-search__glass"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+      <input
+        type="search"
+        class="quiz-search__input"
+        [ngModel]="quizSearch.searchTerm()"
+        (ngModelChange)="quizSearch.searchTerm.set($event)"
+        placeholder="Szukaj quizu po nazwie…"
+        aria-label="Szukaj quizu po nazwie"
+      />
+      <button
+        type="button"
+        class="quiz-search__filter"
+        [class.quiz-search__filter--open]="filtersOpen()"
+        [attr.aria-expanded]="filtersOpen()"
+        aria-label="Filtry"
+        title="Filtry"
+        (click)="toggleFilters()"
+      >
+        <app-category-icon icon="filter_alt" />
+        @if (activeFilterCount() > 0) {
+          <span class="quiz-search__filter-count">{{ activeFilterCount() }}</span>
+        }
+      </button>
+    </div>
+
     <app-select
+      class="quiz-toolbar__sort"
+      icon="swap_vert"
       [options]="sortOptions"
       [value]="sortBy()"
       ariaLabel="Sortuj quizy"
       (valueChange)="setSortBy($event)"
     />
+
+    <a routerLink="/moje-quizy/nowy" class="quiz-toolbar__add">
+      <span class="quiz-toolbar__add-plus" aria-hidden="true">+</span>
+      <span class="quiz-toolbar__add-label">Nowy quiz</span>
+    </a>
   </div>
+
+  @if (filtersOpen()) {
+    <div class="quiz-filters">
+      <button
+        type="button"
+        class="quiz-filters__mine"
+        [class.quiz-filters__mine--on]="quizSearch.mineOnly()"
+        [attr.aria-pressed]="quizSearch.mineOnly()"
+        (click)="quizSearch.toggleMineOnly()"
+      >
+        <app-category-icon icon="person" />
+        Tylko moje quizy
+      </button>
+
+      <hr class="quiz-filters__divider" />
+
+      <div class="quiz-filters__badges">
+        @for (cat of categories; track cat.name) {
+          <button
+            type="button"
+            class="quiz-search__badge"
+            [class]="'quiz-search__badge--' + cat.color"
+            [class.quiz-search__badge--selected]="quizSearch.isCategorySelected(cat.name)"
+            [attr.aria-pressed]="quizSearch.isCategorySelected(cat.name)"
+            (click)="quizSearch.toggleCategory(cat.name)"
+          >
+            <app-category-icon [icon]="cat.icon" />
+            {{ cat.name }}
+          </button>
+        }
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button type="button" class="quiz-filters__clear" (click)="quizSearch.clear()">
+          Wyczyść filtry
+        </button>
+      }
+    </div>
+  }
 
   @if (loading()) {
     <p class="quiz-list__status">Wczytywanie quizów…</p>
@@ -20,13 +103,13 @@
       @if (hasActiveFilters()) {
         Brak quizów pasujących do wyszukiwania.
       } @else {
-        Brak dostępnych quizów — zajrzyj do „Moje quizy", żeby dodać pierwszy!
+        Brak dostępnych quizów — kliknij „+ Nowy quiz", żeby dodać pierwszy!
       }
     </p>
   } @else {
     <ul class="quiz-cards">
       @for (quiz of quizzes(); track quiz.id) {
-        <li class="quiz-card">
+        <li class="quiz-card" [class.quiz-card--mine]="isMine(quiz.id)">
           <a
             class="quiz-card__ranking"
             [routerLink]="['/quiz', quiz.id, 'ranking']"
@@ -50,12 +133,47 @@
               <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
             </svg>
           </a>
+
+          @if (isMine(quiz.id)) {
+            <button
+              type="button"
+              class="quiz-card__delete"
+              (click)="confirmDelete(quiz)"
+              aria-label="Usuń quiz"
+              title="Usuń quiz"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+              </svg>
+            </button>
+          }
+
           <div class="quiz-card__info">
             <h3>{{ quiz.title }}</h3>
-            @if (quiz.category) {
-              <span [class]="categoryClass(quiz)">{{ quiz.category }}</span>
+            @if (quiz.category || isMine(quiz.id)) {
+              <div class="quiz-card__tags">
+                @if (quiz.category) {
+                  <span [class]="categoryClass(quiz)">{{ quiz.category }}</span>
+                }
+                @if (isMine(quiz.id)) {
+                  <span class="quiz-card__mine-tag">Twój quiz</span>
+                }
+              </div>
             }
           </div>
+
           <div class="quiz-card__meta">
             <p class="quiz-card__count">{{ questionCountLabel(quiz.questions.length) }}</p>
             <div class="quiz-card__stats">
@@ -69,11 +187,31 @@
               </span>
             </div>
           </div>
-          <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">
-            Rozwiąż
-          </button>
+
+          <div class="quiz-card__actions">
+            <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">Rozwiąż</button>
+            @if (isMine(quiz.id)) {
+              <a [routerLink]="['/moje-quizy', quiz.id, 'edytuj']" class="quiz-card__edit">Edytuj</a>
+            }
+          </div>
         </li>
       }
     </ul>
+  }
+
+  @if (pendingDelete(); as quiz) {
+    <div class="quiz-dialog__overlay" (click)="cancelDelete()">
+      <div class="quiz-dialog" (click)="$event.stopPropagation()">
+        <h3>Usunąć quiz?</h3>
+        <p>Na pewno chcesz usunąć „{{ quiz.title }}"? Tej operacji nie można cofnąć.</p>
+        @if (deleteError()) {
+          <p class="quiz-dialog__error">Nie udało się usunąć: {{ deleteError() }}</p>
+        }
+        <div class="quiz-dialog__actions">
+          <button type="button" class="quiz-dialog__cancel" (click)="cancelDelete()">Anuluj</button>
+          <button type="button" class="quiz-dialog__confirm" (click)="deleteConfirmed()">Usuń</button>
+        </div>
+      </div>
+    </div>
   }
 </section>

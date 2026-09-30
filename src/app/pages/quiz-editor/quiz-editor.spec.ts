@@ -1,18 +1,22 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { QuizEditor } from './quiz-editor';
-import { MyQuizzes } from '../my-quizzes/my-quizzes';
 import { UserQuizService } from '../../services/user-quiz.service';
 import { provideUserQuizServiceStub } from '../../testing/user-quiz-service.stub';
 import { provideAiQuizServiceStub } from '../../testing/ai-quiz-service.stub';
 import { Quiz } from '../../models';
+
+/** Stand-in for the quiz list the editor navigates back to after save/cancel. */
+@Component({ selector: 'app-quizzes-stub', template: '' })
+class QuizzesStub {}
 
 describe('QuizEditor', () => {
   it('disables saving until the quiz has a title and a valid question', async () => {
     await TestBed.configureTestingModule({
       imports: [QuizEditor],
       providers: [
-        provideRouter([{ path: 'moje-quizy', component: MyQuizzes }]),
+        provideRouter([{ path: 'quizzes', component: QuizzesStub }]),
         provideUserQuizServiceStub(),
       ],
     }).compileComponents();
@@ -35,7 +39,7 @@ describe('QuizEditor', () => {
     await TestBed.configureTestingModule({
       imports: [QuizEditor],
       providers: [
-        provideRouter([{ path: 'moje-quizy', component: MyQuizzes }]),
+        provideRouter([{ path: 'quizzes', component: QuizzesStub }]),
         provideUserQuizServiceStub(),
       ],
     }).compileComponents();
@@ -72,7 +76,7 @@ describe('QuizEditor', () => {
     await TestBed.configureTestingModule({
       imports: [QuizEditor],
       providers: [
-        provideRouter([{ path: 'moje-quizy', component: MyQuizzes }]),
+        provideRouter([{ path: 'quizzes', component: QuizzesStub }]),
         provideUserQuizServiceStub([quiz], [quiz.id]),
       ],
     }).compileComponents();
@@ -98,7 +102,7 @@ describe('QuizEditor', () => {
       await TestBed.configureTestingModule({
         imports: [QuizEditor],
         providers: [
-          provideRouter([{ path: 'moje-quizy', component: MyQuizzes }]),
+          provideRouter([{ path: 'quizzes', component: QuizzesStub }]),
           provideUserQuizServiceStub(),
           ai.provider,
         ],
