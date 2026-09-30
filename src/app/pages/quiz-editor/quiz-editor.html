@@ -11,7 +11,8 @@
     <h3 class="quiz-editor__ai-title">Generuj z AI</h3>
     <p class="quiz-editor__ai-hint">
       Podaj temat, a AI przygotuje wstępne pytania. Wygenerowanie nowych pytań zastąpi te już dodane.
-      Zawsze możesz je potem poprawić lub usunąć.
+      Zawsze możesz je potem poprawić, usunąć albo wygenerować pojedyncze pytanie od nowa
+      (przycisk przy każdym pytaniu).
     </p>
     <div class="quiz-editor__ai-controls">
       <input
@@ -107,13 +108,55 @@
           />
           <button
             type="button"
-            class="quiz-editor__remove"
+            class="quiz-editor__icon-btn quiz-editor__regen-toggle"
+            [class.quiz-editor__icon-btn--active]="regenOpenId() === question.id"
+            [disabled]="regeneratingId() !== null"
+            [attr.aria-expanded]="regenOpenId() === question.id"
+            [attr.aria-busy]="regeneratingId() === question.id"
+            aria-label="Wygeneruj to pytanie od nowa (AI)"
+            title="Wygeneruj na nowo (AI)"
+            (click)="toggleRegen(question)"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">autorenew</span>
+          </button>
+          <button
+            type="button"
+            class="quiz-editor__icon-btn quiz-editor__remove"
             [disabled]="questions.length <= 1"
+            aria-label="Usuń pytanie"
+            title="Usuń pytanie"
             (click)="removeQuestion(i)"
           >
-            Usuń pytanie
+            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
           </button>
         </div>
+
+        @if (regenOpenId() === question.id) {
+          <div class="quiz-editor__question-regen">
+            <input
+              [id]="'q-hint-' + question.id"
+              type="text"
+              class="quiz-editor__question-hint"
+              placeholder="O czym ma być to pytanie? Puste = temat z tytułu quizu."
+              [(ngModel)]="question.aiHint"
+              [disabled]="regeneratingId() !== null"
+              (keyup.enter)="regenerateQuestion(question)"
+            />
+            <button
+              type="button"
+              class="quiz-editor__regen"
+              [disabled]="regeneratingId() !== null"
+              [attr.aria-busy]="regeneratingId() === question.id"
+              (click)="regenerateQuestion(question)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
+              {{ regeneratingId() === question.id ? 'Generuję…' : 'Generuj' }}
+            </button>
+          </div>
+          @if (regenError()?.id === question.id) {
+            <p class="quiz-editor__ai-error">{{ regenError()!.message }}</p>
+          }
+        }
 
         <div class="quiz-editor__block quiz-editor__block--question">
           <label class="quiz-editor__block-label" [for]="'q-text-' + question.id">

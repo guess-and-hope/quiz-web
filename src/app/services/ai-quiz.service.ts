@@ -8,6 +8,8 @@ export interface GenerateQuizParams {
   topic: string;
   count: number;
   difficulty: QuizDifficulty;
+  /** Teksty istniejących pytań, których model ma nie powtarzać (dedup przy re-rollu). */
+  avoid?: string[];
 }
 
 export interface GenerateQuizResult {
@@ -30,6 +32,19 @@ export class AiQuizService {
       throw new Error(await this.extractError(error));
     }
     return { questions: data?.questions ?? [], category: data?.category };
+  }
+
+  /**
+   * Regeneruje pojedyncze pytanie (re-roll): woła tę samą funkcję z `count: 1`
+   * i zwraca pierwsze pytanie albo `null`, gdy AI nic sensownego nie zwróciło.
+   */
+  async regenerateQuestion(params: {
+    topic: string;
+    difficulty: QuizDifficulty;
+    avoid?: string[];
+  }): Promise<Question | null> {
+    const { questions } = await this.generate({ ...params, count: 1 });
+    return questions[0] ?? null;
   }
 
   // Edge Function zwraca komunikat błędu w polu `error` (po polsku) — wyciągamy go

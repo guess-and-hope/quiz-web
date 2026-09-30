@@ -395,22 +395,41 @@
   margin-right: auto;
 }
 
-.quiz-editor__remove {
-  padding: 0.5rem 0.9rem;
+.quiz-editor__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
   border: var(--border-w) solid var(--ink);
   border-radius: 0.6rem;
   background: #fff;
-  color: var(--red);
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
+  color: var(--ink);
   cursor: pointer;
+
+  .material-symbols-outlined {
+    font-size: 1.2rem;
+  }
 
   &:disabled {
     color: #b3ac98;
     border-color: #d8d2c2;
+    background: #fff;
     cursor: not-allowed;
   }
+}
+
+.quiz-editor__regen-toggle {
+  background: var(--yellow);
+  color: var(--ink);
+
+  &.quiz-editor__icon-btn--active {
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+}
+
+.quiz-editor__remove {
+  color: var(--red);
 }
 
 .quiz-editor__block {
@@ -460,6 +479,87 @@
 
 .quiz-editor__explanation {
   font-size: 0.85rem;
+}
+
+.quiz-editor__question-regen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.quiz-editor__question-hint {
+  flex: 1 1 12rem;
+  min-width: 0;
+  padding: 0.55rem 0.8rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.6rem;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+
+  &:disabled {
+    background: #f3efe2;
+    color: #8f8a78;
+    cursor: not-allowed;
+  }
+}
+
+.quiz-editor__regen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.55rem 1rem;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 0.6rem;
+  background: var(--yellow);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+
+  .material-symbols-outlined {
+    font-size: 1.05rem;
+  }
+
+  &:disabled {
+    background: #fff;
+    color: #b3ac98;
+    border-color: #d8d2c2;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  // Aktywny re-roll (jest disabled przez single-flight, ale to jego generujemy):
+  // przywracamy akcent i sygnalizujemy pracę zamiast wyglądu wyłączonego.
+  &[aria-busy='true'] {
+    background: var(--yellow);
+    color: var(--ink);
+    border-color: var(--ink);
+    box-shadow: none;
+    cursor: progress;
+
+    .material-symbols-outlined {
+      animation: qe-spin 0.8s linear infinite;
+    }
+  }
+}
+
+@keyframes qe-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiz-editor__regen[aria-busy='true'] .material-symbols-outlined {
+    animation: none;
+  }
 }
 
 .quiz-editor__options {
