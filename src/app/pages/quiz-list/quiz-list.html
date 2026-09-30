@@ -1,6 +1,16 @@
 <section class="quiz-list">
   <h2>Sprawdzone quizy</h2>
 
+  <div class="quiz-list__controls">
+    <span class="quiz-list__sort-label" id="quiz-sort-label">Sortuj:</span>
+    <app-select
+      [options]="sortOptions"
+      [value]="sortBy()"
+      ariaLabel="Sortuj quizy"
+      (valueChange)="setSortBy($event)"
+    />
+  </div>
+
   @if (loading()) {
     <p class="quiz-list__status">Wczytywanie quizów…</p>
   } @else if (error()) {
