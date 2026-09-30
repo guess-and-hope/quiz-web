@@ -37,13 +37,28 @@ describe('QuizList', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('shows both the curated and the user-submitted quiz sections', async () => {
+  it('shows curated and user-submitted quizzes together in a single list', async () => {
+    const curated: Quiz = {
+      id: 'curated',
+      title: 'Quiz sprawdzony',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      questions: [],
+    };
+    const userSubmitted: Quiz = {
+      id: 'user-submitted',
+      title: 'Quiz użytkownika',
+      createdAt: '2026-01-02T00:00:00.000Z',
+      updatedAt: '2026-01-02T00:00:00.000Z',
+      questions: [],
+    };
+
     await TestBed.configureTestingModule({
       imports: [QuizList],
       providers: [
         provideRouter([]),
-        provideQuizServiceStub(),
-        provideUserQuizServiceStub(),
+        provideQuizServiceStub([curated]),
+        provideUserQuizServiceStub([userSubmitted]),
         noStats.feedback,
         noStats.results,
       ],
@@ -53,8 +68,8 @@ describe('QuizList', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Sprawdzone quizy');
-    expect(text).toContain('Quizy użytkowników');
+    expect(text).toContain('Quiz sprawdzony');
+    expect(text).toContain('Quiz użytkownika');
   });
 
   it('shows the like and solve counts for each quiz', async () => {
