@@ -37,14 +37,17 @@ export class QuizList {
 
   private readonly allQuizzes = this.quizService.getAll();
   private readonly allUserQuizzes = this.userQuizService.getAll();
+  private readonly combinedQuizzes = computed(() => [...this.allQuizzes(), ...this.allUserQuizzes()]);
 
-  protected readonly quizzes = computed(() => this.sort(this.filter(this.allQuizzes())));
-  protected readonly loading = this.quizService.isLoading();
-  protected readonly error = this.quizService.getError();
+  protected readonly quizzes = computed(() => this.sort(this.filter(this.combinedQuizzes())));
 
-  protected readonly userQuizzes = computed(() => this.sort(this.filter(this.allUserQuizzes())));
-  protected readonly userQuizzesLoading = this.userQuizService.isLoading();
-  protected readonly userQuizzesError = this.userQuizService.getError();
+  private readonly quizzesLoading = this.quizService.isLoading();
+  private readonly userQuizzesLoading = this.userQuizService.isLoading();
+  protected readonly loading = computed(() => this.quizzesLoading() || this.userQuizzesLoading());
+
+  private readonly quizzesError = this.quizService.getError();
+  private readonly userQuizzesError = this.userQuizService.getError();
+  protected readonly error = computed(() => this.quizzesError() ?? this.userQuizzesError());
 
   protected readonly hasActiveFilters = this.quizSearch.hasActiveFilters;
 
@@ -56,7 +59,7 @@ export class QuizList {
 
   constructor() {
     effect(() => {
-      const ids = [...this.allQuizzes(), ...this.allUserQuizzes()].map((quiz) => quiz.id);
+      const ids = this.combinedQuizzes().map((quiz) => quiz.id);
       if (ids.length === 0) {
         return;
       }
