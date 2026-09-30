@@ -27,6 +27,7 @@ export class QuizService {
     const { data, error } = await this.supabase.client
       .from('quizzes')
       .select('id, title, category, created_at, updated_at, questions')
+      .eq('is_user_quiz', false)
       .order('created_at', { ascending: true });
 
     if (error) {

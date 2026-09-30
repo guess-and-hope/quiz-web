@@ -28,7 +28,9 @@ function provideSupabaseStub(data: unknown, error: unknown = null) {
       client: {
         from: () => ({
           select: () => ({
-            order: () => Promise.resolve({ data, error }),
+            eq: () => ({
+              order: () => Promise.resolve({ data, error }),
+            }),
           }),
         }),
       },

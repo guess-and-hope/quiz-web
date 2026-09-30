@@ -26,10 +26,14 @@ dodaje się przez SQL / Supabase Studio).
 
 1. Wejdź w **Supabase Studio → SQL Editor**.
 2. Wklej i uruchom zawartość pliku [`supabase/quizzes.sql`](../supabase/quizzes.sql).
+3. **Tylko przy migracji istniejącej bazy** (gdy była osobna tabela `user_quizzes`):
+   uruchom jeszcze [`supabase/merge-user-quizzes.sql`](../supabase/merge-user-quizzes.sql),
+   który przeniesie quizy użytkowników do `quizzes` i usunie starą tabelę.
 
-Skrypt jest **idempotentny** — tworzy tabelę `quizzes`, włącza Row Level Security
-z polityką **publicznego odczytu**, a następnie wgrywa/aktualizuje quizy (upsert po `id`).
-Można go uruchamiać wielokrotnie bez skutków ubocznych.
+Skrypt jest **idempotentny** — tworzy/uzupełnia tabelę `quizzes`, włącza Row Level
+Security (publiczny odczyt + zapis ograniczony do quizów użytkowników), a następnie
+wgrywa/aktualizuje quizy wbudowane (upsert po `id`). Można go uruchamiać wielokrotnie
+bez skutków ubocznych.
 
 Po uruchomieniu odśwież aplikację — quizy wczytają się z bazy.
 
@@ -37,25 +41,35 @@ Po uruchomieniu odśwież aplikację — quizy wczytają się z bazy.
 
 ## 3. Schemat tabeli
 
-| Kolumna       | Typ           | Uwagi                                            |
-| ------------- | ------------- | ------------------------------------------------ |
-| `id`          | `text` (PK)   | np. `geografia` (to samo co dawniej w JSON)      |
-| `title`       | `text`        | tytuł quizu                                       |
-| `description` | `text`        | opcjonalny                                        |
-| `category`    | `text`        | opcjonalny                                        |
-| `created_at`  | `timestamptz` | domyślnie `now()`                                |
-| `updated_at`  | `timestamptz` | domyślnie `now()`                                |
-| `questions`   | `jsonb`       | pełna lista pytań (struktura 1:1 z modelem `Quiz`) |
+Tabela `quizzes` trzyma **zarówno quizy wbudowane, jak i quizy użytkowników** (dawna
+osobna tabela `user_quizzes` została z nią scalona). Rozróżnia je flaga `is_user_quiz`.
+
+| Kolumna          | Typ           | Uwagi                                                        |
+| ---------------- | ------------- | ----------------------------------------------------------- |
+| `id`             | `text` (PK)   | wbudowane: slug (np. `geografia`); użytkownika: UUID          |
+| `title`          | `text`        | tytuł quizu                                                   |
+| `description`    | `text`        | opcjonalny                                                    |
+| `category`       | `text`        | opcjonalny                                                    |
+| `category_color` | `text`        | opcjonalny; używane przez quizy użytkowników                  |
+| `device_id`      | `text`        | anonimowy identyfikator autora; `null` dla quizów wbudowanych |
+| `is_user_quiz`   | `boolean`     | flaga: `false` = wbudowany, `true` = utworzony przez użytkownika |
+| `created_at`     | `timestamptz` | domyślnie `now()`                                            |
+| `updated_at`     | `timestamptz` | domyślnie `now()`                                            |
+| `questions`      | `jsonb`       | pełna lista pytań (struktura 1:1 z modelem `Quiz`)           |
 
 Pytania trzymamy jako **JSONB** (jeden dokument = jeden quiz), bo aplikacja i tak
 czyta cały quiz naraz. Nie rozbijamy pytań/odpowiedzi na osobne tabele — dla tej
 aplikacji byłby to przerost formy.
 
+`QuizService` czyta quizy wbudowane (`is_user_quiz = false`), a `UserQuizService`
+quizy użytkowników (`is_user_quiz = true`) — obie strony tej samej tabeli.
+
 ### RLS
 
-Tabela ma włączone Row Level Security z jedną polityką: **SELECT dla `anon`/`authenticated`**.
-Zapis z frontendu jest zablokowany (brak polityki INSERT/UPDATE/DELETE) — quizy
-modyfikuje się z poziomu Supabase Studio lub kluczem serwisowym.
+- **SELECT** — publiczny dla `anon`/`authenticated` (wszystkie quizy).
+- **INSERT/UPDATE/DELETE** — dozwolony z frontendu **tylko dla quizów użytkowników**
+  (`is_user_quiz = true`). Quizów wbudowanych nie da się zmienić z frontendu — modyfikuje
+  się je przez seed w `quizzes.sql` lub z poziomu Supabase Studio / kluczem serwisowym.
 
 ---
 
