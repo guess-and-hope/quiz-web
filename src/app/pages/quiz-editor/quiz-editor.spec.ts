@@ -159,7 +159,7 @@ describe('QuizEditor', () => {
       expect(component['regenError']()?.id).toBe(component['questions'][0].id);
     });
 
-    it('przekazuje teksty pozostałych pytań jako `avoid` (bez bieżącego)', async () => {
+    it('przekazuje teksty wszystkich pytań jako `avoid` (w tym bieżące, by nie wrócił duplikat)', async () => {
       const { component, control } = await createEditor();
       component['title'] = 'Quiz';
       component['addQuestion']();
@@ -168,7 +168,7 @@ describe('QuizEditor', () => {
 
       await component['regenerateQuestion'](component['questions'][0]);
 
-      expect(control.lastRegenerateArgs?.avoid).toEqual(['Drugie?']);
+      expect(control.lastRegenerateArgs?.avoid).toEqual(['Pierwsze?', 'Drugie?']);
     });
   });
 });

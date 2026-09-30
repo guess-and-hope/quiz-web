@@ -140,6 +140,8 @@ export class QuizEditor {
   // Re-roll pojedynczego pytania: id pytania w trakcie regeneracji (single-flight) i błąd per-pytanie.
   protected readonly regeneratingId = signal<string | null>(null);
   protected readonly regenError = signal<{ id: string; message: string } | null>(null);
+  // Które pytanie ma rozwinięty input wskazówki (pokazywany po kliknięciu ikony re-rolla).
+  protected readonly regenOpenId = signal<string | null>(null);
 
   // Tracks the title we last auto-filled from the topic, so we never clobber a title the user set themselves.
   private titleFromTopic = '';
@@ -208,6 +210,15 @@ export class QuizEditor {
     }
   }
 
+  // Pokazuje/chowa input wskazówki przy danym pytaniu (ikona re-rolla w nagłówku).
+  protected toggleRegen(question: QuestionDraft): void {
+    const isOpen = this.regenOpenId() === question.id;
+    this.regenOpenId.set(isOpen ? null : question.id);
+    if (this.regenError()?.id === question.id) {
+      this.regenError.set(null);
+    }
+  }
+
   // Regeneruje jedno pytanie w miejscu, nie ruszając pozostałych. Temat bierzemy z pola
   // „o czym ma być to pytanie" (aiHint), a gdy puste — z tytułu quizu. Typ dobiera AI.
   protected async regenerateQuestion(question: QuestionDraft): Promise<void> {
@@ -227,9 +238,9 @@ export class QuizEditor {
     this.regeneratingId.set(question.id);
     this.regenError.set(null);
     try {
-      // Pozostałe pytania przekazujemy modelowi, żeby nie zwrócił duplikatu.
+      // Wszystkie istniejące pytania (w tym to regenerowane) przekazujemy modelowi,
+      // żeby nie zwrócił tej samej treści ani jej parafrazy — chcemy pytanie wyraźnie inne.
       const avoid = this.questions
-        .filter((q) => q.id !== question.id)
         .map((q) => q.text.trim())
         .filter((text) => text.length > 0);
 

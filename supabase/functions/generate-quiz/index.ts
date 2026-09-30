@@ -127,7 +127,7 @@ function buildPrompt(topic: string, count: number, difficulty: Difficulty, avoid
   if (avoid.length > 0) {
     const list = avoid.map((text) => `"${text}"`).join('; ');
     lines.push(
-      `Nie powtarzaj ani nie parafrazuj następujących istniejących pytań: ${list}. Wygeneruj pytanie wyraźnie różne od nich.`,
+      `WAŻNE: nie powtarzaj ani nie parafrazuj poniższych już istniejących pytań — zapytaj o INNY fakt lub aspekt tematu, a nowe pytanie musi wyraźnie różnić się treścią i poprawną odpowiedzią: ${list}.`,
     );
   }
 
