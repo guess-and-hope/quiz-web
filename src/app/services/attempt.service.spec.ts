@@ -24,4 +24,18 @@ describe('AttemptService', () => {
       durationSeconds: 0,
     });
   });
+
+  it('tracks whether the current attempt was recorded, and resets on a new submit', () => {
+    const service = TestBed.inject(AttemptService);
+
+    service.submit('geografia', { 'geo-1': 1 });
+    expect(service.isRecorded()).toBe(false);
+
+    service.markRecorded();
+    expect(service.isRecorded()).toBe(true);
+
+    // A fresh play should be recorded again.
+    service.submit('geografia', { 'geo-1': 1 });
+    expect(service.isRecorded()).toBe(false);
+  });
 });

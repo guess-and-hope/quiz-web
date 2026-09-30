@@ -110,6 +110,38 @@ export class QuizResult {
       const quizId = this.id();
       void this.loadFeedback(quizId);
     });
+
+    // Record every completion (even without a nickname — we always have a
+    // device id) so the "solved" counters reflect all plays, not just the
+    // ones the player chose to put on the ranking. `on_leaderboard: false`.
+    // The guard lives in AttemptService so re-opening the result page for the
+    // same attempt doesn't insert a duplicate.
+    effect(() => {
+      const quiz = this.quiz();
+      const score = this.score();
+      const attempt = this.attempt();
+      if (
+        this.attemptService.isRecorded() ||
+        !quiz ||
+        !score ||
+        !attempt ||
+        attempt.quizId !== quiz.id
+      ) {
+        return;
+      }
+      this.attemptService.markRecorded();
+      void this.resultsService.save({
+        quizId: quiz.id,
+        quizTitle: quiz.title,
+        playerName: this.playerIdentity.playerName(),
+        deviceId: this.deviceId,
+        correct: score.correct,
+        total: score.total,
+        percentage: score.percentage,
+        durationSeconds: attempt.durationSeconds,
+        onLeaderboard: false,
+      });
+    });
   }
 
   protected async rate(value: Rating): Promise<void> {
@@ -218,6 +250,7 @@ export class QuizResult {
       total: score.total,
       percentage: score.percentage,
       durationSeconds: attempt.durationSeconds,
+      onLeaderboard: true,
     });
 
     this.saving.set(false);

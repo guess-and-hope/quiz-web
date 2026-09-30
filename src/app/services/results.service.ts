@@ -10,6 +10,9 @@ export interface QuizResultInput {
   total: number;
   percentage: number;
   durationSeconds: number;
+  /** Whether this score should appear on the high-score ranking. Anonymous
+   *  auto-saved completions use `false`; explicit named saves use `true`. */
+  onLeaderboard: boolean;
 }
 
 export interface RankingEntry {
@@ -51,6 +54,7 @@ export class ResultsService {
       total: result.total,
       percentage: result.percentage,
       duration_seconds: result.durationSeconds,
+      on_leaderboard: result.onLeaderboard,
     });
 
     return { error: error ? error.message : null };
@@ -61,7 +65,8 @@ export class ResultsService {
    * descending (percentage → correct answers → completion time, faster
    * ranks higher → earliest submission as the final tiebreaker).
    * Deduplicated by `device_id`, falling back to nickname when it's
-   * missing. Returns up to `limit` entries.
+   * missing. Returns up to `limit` entries. Only high-score entries
+   * (`on_leaderboard = true`) count — anonymous completions are excluded.
    */
   async topForQuiz(
     quizId: string,
@@ -71,6 +76,7 @@ export class ResultsService {
       .from('results')
       .select('player_name, device_id, correct, total, percentage, duration_seconds, created_at')
       .eq('quiz_id', quizId)
+      .eq('on_leaderboard', true)
       .order('percentage', { ascending: false })
       .order('correct', { ascending: false })
       .order('duration_seconds', { ascending: true, nullsFirst: false })
@@ -107,9 +113,14 @@ export class ResultsService {
   }
 
   /**
-   * Number of distinct players who solved each quiz, for the given quiz ids.
-   * Deduplicated by `device_id`, falling back to nickname when it's missing,
-   * same as `topForQuiz`.
+   * How many times each quiz was solved (the "Liczba rozwiązań" counter), for
+   * the given quiz ids. This is a count of solve events, NOT distinct players:
+   * the same person solving five times counts as five.
+   *
+   * Every completion writes exactly one anonymous row (`on_leaderboard = false`);
+   * an explicit "save to ranking" adds a SEPARATE `on_leaderboard = true` row for
+   * the same play. So we count only the `false` rows — that's one per completion,
+   * which avoids double-counting the plays that were also put on the ranking.
    */
   async getSolveCounts(quizIds: string[]): Promise<Record<string, number>> {
     if (quizIds.length === 0) {
@@ -118,23 +129,16 @@ export class ResultsService {
 
     const { data, error } = await this.supabase.client
       .from('results')
-      .select('quiz_id, device_id, player_name')
+      .select('quiz_id')
+      .eq('on_leaderboard', false)
       .in('quiz_id', quizIds);
 
     if (error) {
       return {};
     }
 
-    const seen = new Set<string>();
     const counts: Record<string, number> = {};
-    for (const row of (data ?? []) as Array<
-      Pick<ResultsRow, 'device_id' | 'player_name'> & { quiz_id: string }
-    >) {
-      const identity = `${row.quiz_id}:${row.device_id ?? `name:${row.player_name}`}`;
-      if (seen.has(identity)) {
-        continue;
-      }
-      seen.add(identity);
+    for (const row of (data ?? []) as { quiz_id: string }[]) {
       counts[row.quiz_id] = (counts[row.quiz_id] ?? 0) + 1;
     }
 
