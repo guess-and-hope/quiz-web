@@ -1,0 +1,79 @@
+<div class="image-picker">
+  @if (image(); as img) {
+    <div class="question-image">
+      <img [src]="img.url" alt="" />
+      <a class="question-image__credit" [href]="img.sourceUrl" target="_blank" rel="noopener">
+        Foto: {{ img.photographer }} / Pixabay
+      </a>
+    </div>
+    <div class="image-picker__actions">
+      <button type="button" class="image-picker__action" (click)="openPanel()">
+        Zmień zdjęcie
+      </button>
+      <button
+        type="button"
+        class="image-picker__action image-picker__action--danger"
+        (click)="remove()"
+      >
+        Usuń zdjęcie
+      </button>
+    </div>
+  } @else {
+    <button type="button" class="image-picker__add" (click)="openPanel()">
+      <span class="material-symbols-outlined" aria-hidden="true">add_photo_alternate</span>
+      Dodaj zdjęcie z Pixabay
+    </button>
+  }
+
+  @if (panelOpen()) {
+    <div class="image-picker__panel">
+      <div class="image-picker__search">
+        <input
+          type="text"
+          class="image-picker__search-input"
+          placeholder="Szukaj, np. góry, kot, Warszawa"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+          (keydown.enter)="search()"
+        />
+        <button
+          type="button"
+          class="image-picker__search-button"
+          [disabled]="!query().trim() || searching()"
+          (click)="search()"
+        >
+          {{ searching() ? 'Szukam…' : 'Szukaj' }}
+        </button>
+        <button
+          type="button"
+          class="image-picker__close"
+          (click)="closePanel()"
+          aria-label="Zamknij wyszukiwanie"
+        >
+          ✕
+        </button>
+      </div>
+
+      @if (error()) {
+        <p class="image-picker__error">{{ error() }}</p>
+      }
+
+      @if (results().length) {
+        <div class="image-picker__results">
+          @for (result of results(); track result.id) {
+            <button
+              type="button"
+              class="image-picker__result"
+              (click)="pick(result)"
+              [attr.aria-label]="'Wybierz zdjęcie od ' + result.photographer"
+            >
+              <img [src]="result.thumbnailUrl" alt="" loading="lazy" />
+            </button>
+          }
+        </div>
+      } @else if (searched() && !searching() && !error()) {
+        <p class="image-picker__empty">Brak wyników. Spróbuj innego hasła.</p>
+      }
+    </div>
+  }
+</div>

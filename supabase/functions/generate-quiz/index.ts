@@ -9,12 +9,17 @@
 //
 // Wdrożenie (aplikacja nie ma logowania, więc endpoint bez weryfikacji JWT):
 //   npx supabase functions deploy generate-quiz --no-verify-jwt
+//
+// Jeśli sekret PIXABAY_API_KEY jest ustawiony (etap 5, zdjęcia przy pytaniach),
+// do każdego wygenerowanego pytania automatycznie dobierane jest pasujące zdjęcie.
+// Bez tego sekretu funkcja działa jak wcześniej — po prostu bez zdjęć.
+
+import { searchPixabay } from '../_shared/pixabay.ts';
 
 // Model można nadpisać sekretem bez zmiany kodu:
 //   npx supabase secrets set GEMINI_MODEL=<inny-model>
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') ?? 'gemini-3.5-flash-lite';
-const GEMINI_URL =
-  `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // Górny limit pytań na jedno wywołanie — chroni darmowy limit Gemini.
 const MAX_QUESTIONS = 20;
@@ -53,12 +58,44 @@ interface RawQuestion {
   options: string[];
   correctIndexes: number[];
   correctBoolean: boolean;
+  // Krótkie hasło po angielsku do wyszukania pasującego zdjęcia (patrz sekcja Pixabay niżej).
+  imageQuery?: string;
+}
+
+interface QuestionImage {
+  url: string;
+  photographer: string;
+  photographerUrl: string;
+  sourceUrl: string;
 }
 
 type Question =
-  | { id: string; type: 'single'; text: string; explanation?: string; options: string[]; correct: number }
-  | { id: string; type: 'multi'; text: string; explanation?: string; options: string[]; correct: number[] }
-  | { id: string; type: 'boolean'; text: string; explanation?: string; correct: boolean };
+  | {
+      id: string;
+      type: 'single';
+      text: string;
+      explanation?: string;
+      image?: QuestionImage;
+      options: string[];
+      correct: number;
+    }
+  | {
+      id: string;
+      type: 'multi';
+      text: string;
+      explanation?: string;
+      image?: QuestionImage;
+      options: string[];
+      correct: number[];
+    }
+  | {
+      id: string;
+      type: 'boolean';
+      text: string;
+      explanation?: string;
+      image?: QuestionImage;
+      correct: boolean;
+    };
 
 // Musi odpowiadać liście kategorii w aplikacji (src/app/models/quiz.model.ts).
 // Model wybiera jedną z nich, a aplikacja auto-zaznacza pasującą plakietkę.
@@ -96,6 +133,7 @@ const responseSchema = {
           options: { type: 'ARRAY', items: { type: 'STRING' } },
           correctIndexes: { type: 'ARRAY', items: { type: 'INTEGER' } },
           correctBoolean: { type: 'BOOLEAN' },
+          imageQuery: { type: 'STRING' },
         },
         required: ['type', 'text', 'options', 'correctIndexes', 'correctBoolean'],
       },
@@ -110,7 +148,12 @@ const DIFFICULTY_PL: Record<Difficulty, string> = {
   hard: 'trudny',
 };
 
-function buildPrompt(topic: string, count: number, difficulty: Difficulty, avoid: string[] = []): string {
+function buildPrompt(
+  topic: string,
+  count: number,
+  difficulty: Difficulty,
+  avoid: string[] = [],
+): string {
   const lines = [
     `Wygeneruj ${count} pytań quizowych po polsku na temat: "${topic}".`,
     `Poziom trudności: ${DIFFICULTY_PL[difficulty]}.`,
@@ -121,6 +164,10 @@ function buildPrompt(topic: string, count: number, difficulty: Difficulty, avoid
     '- boolean: options pozostaw puste ([]), correctIndexes pozostaw puste ([]), correctBoolean to poprawna odpowiedź (true = prawda, false = fałsz).',
     'Indeksy w correctIndexes liczone są od 0. Pole explanation to krótkie wyjaśnienie poprawnej odpowiedzi.',
     `Dobierz też jedną kategorię najlepiej pasującą do tematu z tej listy (użyj dokładnie takiej nazwy): ${CATEGORY_NAMES.join(', ')}. Zwróć ją w polu "category".`,
+    'Dla każdego pytania podaj pole imageQuery — krótkie hasło PO ANGIELSKU (2-5 słów)',
+    'opisujące zdjęcie stockowe, które dobrze zilustrowałoby to pytanie (konkretny obiekt,',
+    'miejsce, zwierzę czy postać — nie słowa typu "quiz" czy "question"). Jeśli pytanie nie ma',
+    'żadnego sensownego motywu wizualnego, zostaw imageQuery puste.',
   ];
 
   // Przy re-rollu przekazujemy istniejące pytania, żeby model nie zwrócił duplikatu.
@@ -166,7 +213,9 @@ function toQuestion(raw: RawQuestion): Question | null {
   if (options.length < 2 || options.some((option) => option.length === 0)) return null;
 
   const indexes = Array.from(
-    new Set((raw.correctIndexes ?? []).filter((i) => Number.isInteger(i) && i >= 0 && i < options.length)),
+    new Set(
+      (raw.correctIndexes ?? []).filter((i) => Number.isInteger(i) && i >= 0 && i < options.length),
+    ),
   );
   if (indexes.length === 0) return null;
 
@@ -272,9 +321,14 @@ Deno.serve(async (req) => {
   const data = await geminiRes.json();
   const rawText: string | undefined = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!rawText) {
-    console.error('generate-quiz: brak treści w odpowiedzi Gemini', JSON.stringify(data).slice(0, 800));
+    console.error(
+      'generate-quiz: brak treści w odpowiedzi Gemini',
+      JSON.stringify(data).slice(0, 800),
+    );
     const detail =
-      data?.promptFeedback?.blockReason ?? data?.candidates?.[0]?.finishReason ?? 'brak treści w odpowiedzi';
+      data?.promptFeedback?.blockReason ??
+      data?.candidates?.[0]?.finishReason ??
+      'brak treści w odpowiedzi';
     return json({ error: 'AI nie zwróciło żadnych pytań.', detail: String(detail) }, 502);
   }
 
@@ -285,12 +339,19 @@ Deno.serve(async (req) => {
     return json({ error: 'AI zwróciło odpowiedź w nieprawidłowym formacie.' }, 502);
   }
 
-  const questions = (parsed.questions ?? [])
-    .map(toQuestion)
-    .filter((question): question is Question => question !== null);
+  const valid = (parsed.questions ?? [])
+    .map((raw) => ({ question: toQuestion(raw), imageQuery: raw.imageQuery }))
+    .filter((item): item is { question: Question; imageQuery?: string } => item.question !== null);
 
-  if (questions.length === 0) {
+  if (valid.length === 0) {
     return json({ error: 'Nie udało się wygenerować poprawnych pytań. Spróbuj ponownie.' }, 422);
+  }
+
+  const questions = valid.map((item) => item.question);
+
+  const pixabayApiKey = Deno.env.get('PIXABAY_API_KEY');
+  if (pixabayApiKey) {
+    await attachImages(valid, pixabayApiKey);
   }
 
   // Zwracamy kategorię tylko, gdy jest jedną ze znanych — inaczej pomijamy (aplikacja jej nie zaznaczy).
@@ -301,3 +362,44 @@ Deno.serve(async (req) => {
 
   return json({ questions, category }, 200);
 });
+
+// Kilku kandydatów na pytanie, żeby było z czego wybrać zamiennik, gdy pierwszy
+// wynik trafi się już zajęty przez inne pytanie (patrz niżej).
+const IMAGE_CANDIDATES_PER_QUESTION = 5;
+
+// Dobiera zdjęcia z Pixabay do pytań na podstawie imageQuery zwróconego przez Gemini.
+// Wyszukiwanie idzie równolegle (jedno zapytanie na pytanie), ale przydział zdjęć jest
+// sekwencyjny: każde pytanie dostaje pierwszego kandydata, który nie trafił już do
+// wcześniejszego pytania — dzięki temu żadne dwa pytania nie dostają tego samego zdjęcia.
+// Brak wyników, błąd Pixabay albo wyczerpanie kandydatów dla pojedynczego pytania nie
+// przerywa całej generacji — to pytanie po prostu zostaje bez zdjęcia.
+async function attachImages(
+  items: { question: Question; imageQuery?: string }[],
+  pixabayApiKey: string,
+): Promise<void> {
+  const candidateLists = await Promise.all(
+    items.map(async ({ imageQuery }) => {
+      const query = (imageQuery ?? '').trim();
+      if (!query) return [];
+      try {
+        return await searchPixabay(pixabayApiKey, query, IMAGE_CANDIDATES_PER_QUESTION);
+      } catch (err) {
+        console.warn(`generate-quiz: nie udało się wyszukać zdjęć dla "${query}"`, err);
+        return [];
+      }
+    }),
+  );
+
+  const usedIds = new Set<number>();
+  items.forEach(({ question }, index) => {
+    const result = candidateLists[index].find((candidate) => !usedIds.has(candidate.id));
+    if (!result) return;
+    usedIds.add(result.id);
+    question.image = {
+      url: result.url,
+      photographer: result.photographer,
+      photographerUrl: result.photographerUrl,
+      sourceUrl: result.sourceUrl,
+    };
+  });
+}

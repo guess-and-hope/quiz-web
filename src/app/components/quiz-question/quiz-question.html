@@ -5,6 +5,14 @@
       <p class="quiz-question__progress">{{ progress() }}</p>
     }
   </div>
+  @if (question().image; as img) {
+    <div class="question-image">
+      <img [src]="img.url" alt="" />
+      <a class="question-image__credit" [href]="img.sourceUrl" target="_blank" rel="noopener">
+        Foto: {{ img.photographer }} / Pixabay
+      </a>
+    </div>
+  }
   <p class="quiz-question__text">{{ question().text }}</p>
 
   @switch (question().type) {
@@ -19,7 +27,10 @@
                 [checked]="isSingleSelected($index)"
                 (change)="selectSingle($index)"
               />
-              <span class="quiz-question__control quiz-question__control--radio" aria-hidden="true"></span>
+              <span
+                class="quiz-question__control quiz-question__control--radio"
+                aria-hidden="true"
+              ></span>
               {{ option }}
             </label>
           </li>
@@ -36,7 +47,10 @@
                 [checked]="isMultiSelected($index)"
                 (change)="toggleMulti($index)"
               />
-              <span class="quiz-question__control quiz-question__control--checkbox" aria-hidden="true"></span>
+              <span
+                class="quiz-question__control quiz-question__control--checkbox"
+                aria-hidden="true"
+              ></span>
               {{ option }}
             </label>
           </li>

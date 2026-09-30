@@ -3,16 +3,18 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { QuizDraft, UserQuizService } from '../../services/user-quiz.service';
 import { AiQuizService, QuizDifficulty } from '../../services/ai-quiz.service';
-import { CATEGORIES, Question, QuestionType } from '../../models';
+import { CATEGORIES, Question, QuestionImage, QuestionType } from '../../models';
 import { CategoryIcon } from '../../shared/category-icon/category-icon';
 import { AppSelect } from '../../components/app-select/app-select';
 import { Autosize } from '../../shared/autosize';
+import { ImagePicker } from '../../components/image-picker/image-picker';
 
 interface QuestionDraft {
   id: string;
   type: QuestionType;
   text: string;
   explanation: string;
+  image: QuestionImage | null;
   options: string[];
   correctSingle: number | null;
   correctMulti: boolean[];
@@ -27,6 +29,7 @@ function blankQuestion(): QuestionDraft {
     type: 'single',
     text: '',
     explanation: '',
+    image: null,
     options: ['', ''],
     correctSingle: null,
     correctMulti: [false, false],
@@ -36,7 +39,13 @@ function blankQuestion(): QuestionDraft {
 }
 
 function toDraft(question: Question): QuestionDraft {
-  const base = { id: question.id, text: question.text, explanation: question.explanation ?? '', aiHint: '' };
+  const base = {
+    id: question.id,
+    text: question.text,
+    explanation: question.explanation ?? '',
+    image: question.image ?? null,
+    aiHint: '',
+  };
 
   if (question.type === 'boolean') {
     return {
@@ -75,6 +84,7 @@ function toQuestion(draft: QuestionDraft): Question {
     id: draft.id,
     text: draft.text.trim(),
     explanation: draft.explanation.trim() || undefined,
+    image: draft.image ?? undefined,
   };
 
   if (draft.type === 'boolean') {
@@ -96,7 +106,7 @@ function toQuestion(draft: QuestionDraft): Question {
 
 @Component({
   selector: 'app-quiz-editor',
-  imports: [FormsModule, RouterLink, CategoryIcon, AppSelect, Autosize],
+  imports: [FormsModule, RouterLink, CategoryIcon, AppSelect, Autosize, ImagePicker],
   templateUrl: './quiz-editor.html',
   styleUrl: './quiz-editor.scss',
 })
@@ -240,9 +250,7 @@ export class QuizEditor {
     try {
       // Wszystkie istniejące pytania (w tym to regenerowane) przekazujemy modelowi,
       // żeby nie zwrócił tej samej treści ani jej parafrazy — chcemy pytanie wyraźnie inne.
-      const avoid = this.questions
-        .map((q) => q.text.trim())
-        .filter((text) => text.length > 0);
+      const avoid = this.questions.map((q) => q.text.trim()).filter((text) => text.length > 0);
 
       const fresh = await this.aiQuizService.regenerateQuestion({
         topic,
@@ -251,7 +259,10 @@ export class QuizEditor {
       });
 
       if (!fresh) {
-        this.regenError.set({ id: question.id, message: 'AI nie zwróciło pytania. Spróbuj ponownie.' });
+        this.regenError.set({
+          id: question.id,
+          message: 'AI nie zwróciło pytania. Spróbuj ponownie.',
+        });
         return;
       }
 

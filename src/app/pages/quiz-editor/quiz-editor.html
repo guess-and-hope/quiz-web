@@ -5,264 +5,279 @@
     <p class="quiz-editor__status">Nie znaleziono quizu.</p>
     <a routerLink="/moje-quizy">Wróć do listy</a>
   } @else {
-  <h2>{{ editingId ? 'Edytuj quiz' : 'Nowy quiz' }}</h2>
+    <h2>{{ editingId ? 'Edytuj quiz' : 'Nowy quiz' }}</h2>
 
-  <div class="quiz-editor__ai">
-    <h3 class="quiz-editor__ai-title">Generuj z AI</h3>
-    <p class="quiz-editor__ai-hint">
-      Podaj temat, a AI przygotuje wstępne pytania. Wygenerowanie nowych pytań zastąpi te już dodane.
-      Zawsze możesz je potem poprawić, usunąć albo wygenerować pojedyncze pytanie od nowa
-      (przycisk przy każdym pytaniu).
-    </p>
-    <div class="quiz-editor__ai-controls">
-      <input
-        type="text"
-        class="quiz-editor__ai-topic"
-        placeholder="Temat, np. Historia Polski"
-        [ngModel]="aiTopic"
-        (ngModelChange)="onAiTopicChange($event)"
-        [disabled]="aiLoading()"
-      />
-      <label class="quiz-editor__ai-inline">
-        Liczba
-        <input type="number" min="1" max="15" [(ngModel)]="aiCount" [disabled]="aiLoading()" />
-      </label>
-      <div class="quiz-editor__ai-inline">
-        Poziom
-        <app-select
-          [options]="difficulties"
-          [value]="aiDifficulty"
+    <div class="quiz-editor__ai">
+      <h3 class="quiz-editor__ai-title">Generuj z AI</h3>
+      <p class="quiz-editor__ai-hint">
+        Podaj temat, a AI przygotuje wstępne pytania razem z pasującymi zdjęciami (jeśli je
+        znajdzie). Wygenerowanie nowych pytań zastąpi te już dodane. Zawsze możesz je potem
+        poprawić, usunąć albo wygenerować pojedyncze pytanie od nowa (przycisk przy każdym pytaniu).
+      </p>
+      <div class="quiz-editor__ai-controls">
+        <input
+          type="text"
+          class="quiz-editor__ai-topic"
+          placeholder="Temat, np. Historia Polski"
+          [ngModel]="aiTopic"
+          (ngModelChange)="onAiTopicChange($event)"
           [disabled]="aiLoading()"
-          ariaLabel="Poziom trudności"
-          (valueChange)="setDifficulty($event)"
         />
-      </div>
-      <button
-        type="button"
-        class="quiz-editor__ai-generate"
-        [disabled]="!aiTopic.trim() || aiLoading()"
-        (click)="generateWithAi()"
-      >
-        <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
-        {{ aiLoading() ? 'Generuję…' : 'Generuj' }}
-      </button>
-    </div>
-    @if (aiLoading()) {
-      <div class="ai-spinner" role="status" aria-label="Generowanie pytań przez AI">
-        <div class="ai-spinner__stage">
-          <div class="ai-spinner__card" aria-hidden="true">
-            <span class="ai-spinner__face ai-spinner__face--front">?</span>
-            <span class="ai-spinner__face ai-spinner__face--back">!</span>
-          </div>
+        <label class="quiz-editor__ai-inline">
+          Liczba
+          <input type="number" min="1" max="15" [(ngModel)]="aiCount" [disabled]="aiLoading()" />
+        </label>
+        <div class="quiz-editor__ai-inline">
+          Poziom
+          <app-select
+            [options]="difficulties"
+            [value]="aiDifficulty"
+            [disabled]="aiLoading()"
+            ariaLabel="Poziom trudności"
+            (valueChange)="setDifficulty($event)"
+          />
         </div>
-        <div class="ai-spinner__options" aria-hidden="true">
-          <span class="ai-spinner__opt" style="--i: 0">A</span>
-          <span class="ai-spinner__opt" style="--i: 1">B</span>
-          <span class="ai-spinner__opt" style="--i: 2">C</span>
-          <span class="ai-spinner__opt" style="--i: 3">D</span>
-        </div>
-        <p class="ai-spinner__caption">
-          AI układa Twoje pytania<span class="ai-spinner__dots"><i>.</i><i>.</i><i>.</i></span>
-        </p>
-      </div>
-    }
-    @if (aiError()) {
-      <p class="quiz-editor__ai-error">{{ aiError() }}</p>
-    }
-  </div>
-
-  <div class="quiz-editor__field">
-    <label for="qe-title">Tytuł*</label>
-    <input id="qe-title" type="text" [(ngModel)]="title" placeholder="Np. Stolice świata" />
-  </div>
-
-  <div class="quiz-editor__field">
-    <label>Kategoria</label>
-    <div class="quiz-editor__categories">
-      @for (cat of categories; track cat.name) {
         <button
           type="button"
-          class="quiz-editor__category-badge"
-          [class]="'quiz-editor__category-badge--' + cat.color"
-          [class.quiz-editor__category-badge--selected]="category === cat.name"
-          [attr.aria-pressed]="category === cat.name"
-          (click)="pickCategory(cat.name)"
+          class="quiz-editor__ai-generate"
+          [disabled]="!aiTopic.trim() || aiLoading()"
+          (click)="generateWithAi()"
         >
-          <app-category-icon [icon]="cat.icon" />
-          {{ cat.name }}
+          <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
+          {{ aiLoading() ? 'Generuję…' : 'Generuj' }}
         </button>
+      </div>
+      @if (aiLoading()) {
+        <div class="ai-spinner" role="status" aria-label="Generowanie pytań przez AI">
+          <div class="ai-spinner__stage">
+            <div class="ai-spinner__card" aria-hidden="true">
+              <span class="ai-spinner__face ai-spinner__face--front">?</span>
+              <span class="ai-spinner__face ai-spinner__face--back">!</span>
+            </div>
+          </div>
+          <div class="ai-spinner__options" aria-hidden="true">
+            <span class="ai-spinner__opt" style="--i: 0">A</span>
+            <span class="ai-spinner__opt" style="--i: 1">B</span>
+            <span class="ai-spinner__opt" style="--i: 2">C</span>
+            <span class="ai-spinner__opt" style="--i: 3">D</span>
+          </div>
+          <p class="ai-spinner__caption">
+            AI układa Twoje pytania<span class="ai-spinner__dots"><i>.</i><i>.</i><i>.</i></span>
+          </p>
+        </div>
+      }
+      @if (aiError()) {
+        <p class="quiz-editor__ai-error">{{ aiError() }}</p>
       }
     </div>
-  </div>
 
-  <div class="quiz-editor__questions">
-    @for (question of questions; track question.id; let i = $index) {
-      <div class="quiz-editor__question">
-        <div class="quiz-editor__question-header">
-          <span class="quiz-editor__question-number">Pytanie {{ i + 1 }}</span>
-          <app-select
-            [options]="questionTypes"
-            [value]="question.type"
-            ariaLabel="Typ pytania"
-            (valueChange)="setQuestionType(question, $event)"
-          />
+    <div class="quiz-editor__field">
+      <label for="qe-title">Tytuł*</label>
+      <input id="qe-title" type="text" [(ngModel)]="title" placeholder="Np. Stolice świata" />
+    </div>
+
+    <div class="quiz-editor__field">
+      <label>Kategoria</label>
+      <div class="quiz-editor__categories">
+        @for (cat of categories; track cat.name) {
           <button
             type="button"
-            class="quiz-editor__icon-btn quiz-editor__regen-toggle"
-            [class.quiz-editor__icon-btn--active]="regenOpenId() === question.id"
-            [disabled]="regeneratingId() !== null"
-            [attr.aria-expanded]="regenOpenId() === question.id"
-            [attr.aria-busy]="regeneratingId() === question.id"
-            aria-label="Wygeneruj to pytanie od nowa (AI)"
-            title="Wygeneruj na nowo (AI)"
-            (click)="toggleRegen(question)"
+            class="quiz-editor__category-badge"
+            [class]="'quiz-editor__category-badge--' + cat.color"
+            [class.quiz-editor__category-badge--selected]="category === cat.name"
+            [attr.aria-pressed]="category === cat.name"
+            (click)="pickCategory(cat.name)"
           >
-            <span class="material-symbols-outlined" aria-hidden="true">autorenew</span>
+            <app-category-icon [icon]="cat.icon" />
+            {{ cat.name }}
           </button>
-          <button
-            type="button"
-            class="quiz-editor__icon-btn quiz-editor__remove"
-            [disabled]="questions.length <= 1"
-            aria-label="Usuń pytanie"
-            title="Usuń pytanie"
-            (click)="removeQuestion(i)"
-          >
-            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-          </button>
-        </div>
+        }
+      </div>
+    </div>
 
-        @if (regenOpenId() === question.id) {
-          <div class="quiz-editor__question-regen">
-            <input
-              [id]="'q-hint-' + question.id"
-              type="text"
-              class="quiz-editor__question-hint"
-              placeholder="O czym ma być to pytanie? Puste = temat z tytułu quizu."
-              [(ngModel)]="question.aiHint"
-              [disabled]="regeneratingId() !== null"
-              (keyup.enter)="regenerateQuestion(question)"
+    <div class="quiz-editor__questions">
+      @for (question of questions; track question.id; let i = $index) {
+        <div class="quiz-editor__question">
+          <div class="quiz-editor__question-header">
+            <span class="quiz-editor__question-number">Pytanie {{ i + 1 }}</span>
+            <app-select
+              [options]="questionTypes"
+              [value]="question.type"
+              ariaLabel="Typ pytania"
+              (valueChange)="setQuestionType(question, $event)"
             />
             <button
               type="button"
-              class="quiz-editor__regen"
+              class="quiz-editor__icon-btn quiz-editor__regen-toggle"
+              [class.quiz-editor__icon-btn--active]="regenOpenId() === question.id"
               [disabled]="regeneratingId() !== null"
+              [attr.aria-expanded]="regenOpenId() === question.id"
               [attr.aria-busy]="regeneratingId() === question.id"
-              (click)="regenerateQuestion(question)"
+              aria-label="Wygeneruj to pytanie od nowa (AI)"
+              title="Wygeneruj na nowo (AI)"
+              (click)="toggleRegen(question)"
             >
-              <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
-              {{ regeneratingId() === question.id ? 'Generuję…' : 'Generuj' }}
+              <span class="material-symbols-outlined" aria-hidden="true">autorenew</span>
+            </button>
+            <button
+              type="button"
+              class="quiz-editor__icon-btn quiz-editor__remove"
+              [disabled]="questions.length <= 1"
+              aria-label="Usuń pytanie"
+              title="Usuń pytanie"
+              (click)="removeQuestion(i)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">delete</span>
             </button>
           </div>
-          @if (regenError()?.id === question.id) {
-            <p class="quiz-editor__ai-error">{{ regenError()!.message }}</p>
-          }
-        }
 
-        <div class="quiz-editor__block quiz-editor__block--question">
-          <label class="quiz-editor__block-label" [for]="'q-text-' + question.id">
-            <span class="material-symbols-outlined" aria-hidden="true">help</span>
-            Treść pytania
-          </label>
-          <textarea
-            [id]="'q-text-' + question.id"
-            class="quiz-editor__question-text"
-            rows="1"
-            placeholder="O co chcesz zapytać?"
-            [appAutosize]="question.text"
-            [(ngModel)]="question.text"
-          ></textarea>
-        </div>
-
-        @if (question.type === 'boolean') {
-          <div class="quiz-editor__boolean">
-            <label class="quiz-editor__boolean-option">
+          @if (regenOpenId() === question.id) {
+            <div class="quiz-editor__question-regen">
               <input
-                type="radio"
-                [name]="'correct-' + question.id"
-                [checked]="question.correctBoolean === true"
-                (change)="question.correctBoolean = true"
+                [id]="'q-hint-' + question.id"
+                type="text"
+                class="quiz-editor__question-hint"
+                placeholder="O czym ma być to pytanie? Puste = temat z tytułu quizu."
+                [(ngModel)]="question.aiHint"
+                [disabled]="regeneratingId() !== null"
+                (keyup.enter)="regenerateQuestion(question)"
               />
-              Prawda
-            </label>
-            <label class="quiz-editor__boolean-option">
-              <input
-                type="radio"
-                [name]="'correct-' + question.id"
-                [checked]="question.correctBoolean === false"
-                (change)="question.correctBoolean = false"
-              />
-              Fałsz
-            </label>
-          </div>
-        } @else {
-          <div class="quiz-editor__options">
-            @for (option of question.options; track $index; let oi = $index) {
-              <div class="quiz-editor__option">
-                @if (question.type === 'single') {
-                  <input
-                    type="radio"
-                    [name]="'correct-' + question.id"
-                    [checked]="question.correctSingle === oi"
-                    (change)="question.correctSingle = oi"
-                  />
-                } @else {
-                  <input type="checkbox" [(ngModel)]="question.correctMulti[oi]" />
-                }
-                <input
-                  type="text"
-                  class="quiz-editor__option-text"
-                  [placeholder]="'Odpowiedź ' + (oi + 1)"
-                  [(ngModel)]="question.options[oi]"
-                />
-                <button
-                  type="button"
-                  class="quiz-editor__remove-option"
-                  [disabled]="question.options.length <= 2"
-                  (click)="removeOption(question, oi)"
-                  aria-label="Usuń odpowiedź"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                type="button"
+                class="quiz-editor__regen"
+                [disabled]="regeneratingId() !== null"
+                [attr.aria-busy]="regeneratingId() === question.id"
+                (click)="regenerateQuestion(question)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>
+                {{ regeneratingId() === question.id ? 'Generuję…' : 'Generuj' }}
+              </button>
+            </div>
+            @if (regenError()?.id === question.id) {
+              <p class="quiz-editor__ai-error">{{ regenError()!.message }}</p>
             }
-            <button type="button" class="quiz-editor__add-option" (click)="addOption(question)">
-              + Dodaj opcję
-            </button>
+          }
+
+          <div class="quiz-editor__block quiz-editor__block--question">
+            <label class="quiz-editor__block-label" [for]="'q-text-' + question.id">
+              <span class="material-symbols-outlined" aria-hidden="true">help</span>
+              Treść pytania
+            </label>
+            <textarea
+              [id]="'q-text-' + question.id"
+              class="quiz-editor__question-text"
+              rows="1"
+              placeholder="O co chcesz zapytać?"
+              [appAutosize]="question.text"
+              [(ngModel)]="question.text"
+            ></textarea>
           </div>
-        }
 
-        <div class="quiz-editor__block quiz-editor__block--explanation">
-          <label class="quiz-editor__block-label" [for]="'q-expl-' + question.id">
-            <span class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
-            Wyjaśnienie <span class="quiz-editor__block-optional">(opcjonalnie)</span>
-          </label>
-          <textarea
-            [id]="'q-expl-' + question.id"
-            class="quiz-editor__explanation"
-            rows="1"
-            placeholder="Wyjaśnij, dlaczego to poprawna odpowiedź — pokażemy graczom po udzieleniu odpowiedzi."
-            [appAutosize]="question.explanation"
-            [(ngModel)]="question.explanation"
-          ></textarea>
+          <div class="quiz-editor__block quiz-editor__block--image">
+            <span class="quiz-editor__block-label">
+              <span class="material-symbols-outlined" aria-hidden="true">image</span>
+              Zdjęcie <span class="quiz-editor__block-optional">(opcjonalnie)</span>
+            </span>
+            <app-image-picker [image]="question.image" (imageChange)="question.image = $event" />
+          </div>
+
+          @if (question.type === 'boolean') {
+            <div class="quiz-editor__boolean">
+              <label class="quiz-editor__boolean-option">
+                <input
+                  type="radio"
+                  [name]="'correct-' + question.id"
+                  [checked]="question.correctBoolean === true"
+                  (change)="question.correctBoolean = true"
+                />
+                Prawda
+              </label>
+              <label class="quiz-editor__boolean-option">
+                <input
+                  type="radio"
+                  [name]="'correct-' + question.id"
+                  [checked]="question.correctBoolean === false"
+                  (change)="question.correctBoolean = false"
+                />
+                Fałsz
+              </label>
+            </div>
+          } @else {
+            <div class="quiz-editor__options">
+              @for (option of question.options; track $index; let oi = $index) {
+                <div class="quiz-editor__option">
+                  @if (question.type === 'single') {
+                    <input
+                      type="radio"
+                      [name]="'correct-' + question.id"
+                      [checked]="question.correctSingle === oi"
+                      (change)="question.correctSingle = oi"
+                    />
+                  } @else {
+                    <input type="checkbox" [(ngModel)]="question.correctMulti[oi]" />
+                  }
+                  <input
+                    type="text"
+                    class="quiz-editor__option-text"
+                    [placeholder]="'Odpowiedź ' + (oi + 1)"
+                    [(ngModel)]="question.options[oi]"
+                  />
+                  <button
+                    type="button"
+                    class="quiz-editor__remove-option"
+                    [disabled]="question.options.length <= 2"
+                    (click)="removeOption(question, oi)"
+                    aria-label="Usuń odpowiedź"
+                  >
+                    ✕
+                  </button>
+                </div>
+              }
+              <button type="button" class="quiz-editor__add-option" (click)="addOption(question)">
+                + Dodaj opcję
+              </button>
+            </div>
+          }
+
+          <div class="quiz-editor__block quiz-editor__block--explanation">
+            <label class="quiz-editor__block-label" [for]="'q-expl-' + question.id">
+              <span class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
+              Wyjaśnienie <span class="quiz-editor__block-optional">(opcjonalnie)</span>
+            </label>
+            <textarea
+              [id]="'q-expl-' + question.id"
+              class="quiz-editor__explanation"
+              rows="1"
+              placeholder="Wyjaśnij, dlaczego to poprawna odpowiedź — pokażemy graczom po udzieleniu odpowiedzi."
+              [appAutosize]="question.explanation"
+              [(ngModel)]="question.explanation"
+            ></textarea>
+          </div>
         </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
 
-  <button type="button" class="quiz-editor__add-question" (click)="addQuestion()">+ Dodaj pytanie</button>
-
-  @if (validationMessage) {
-    <p class="quiz-editor__validation">{{ validationMessage }}</p>
-  }
-  @if (saveError()) {
-    <p class="quiz-editor__validation">Nie udało się zapisać: {{ saveError() }}</p>
-  }
-
-  <div class="quiz-editor__actions">
-    <button type="button" class="quiz-editor__save" [disabled]="!canSave || saving()" (click)="save()">
-      {{ saving() ? 'Zapisywanie…' : 'Zapisz quiz' }}
+    <button type="button" class="quiz-editor__add-question" (click)="addQuestion()">
+      + Dodaj pytanie
     </button>
-    <a routerLink="/moje-quizy" class="quiz-editor__cancel">Anuluj</a>
-  </div>
+
+    @if (validationMessage) {
+      <p class="quiz-editor__validation">{{ validationMessage }}</p>
+    }
+    @if (saveError()) {
+      <p class="quiz-editor__validation">Nie udało się zapisać: {{ saveError() }}</p>
+    }
+
+    <div class="quiz-editor__actions">
+      <button
+        type="button"
+        class="quiz-editor__save"
+        [disabled]="!canSave || saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Zapisywanie…' : 'Zapisz quiz' }}
+      </button>
+      <a routerLink="/moje-quizy" class="quiz-editor__cancel">Anuluj</a>
+    </div>
   }
 </div>
