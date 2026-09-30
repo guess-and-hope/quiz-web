@@ -56,11 +56,12 @@ export class UserQuizService {
 
   async create(draft: QuizDraft): Promise<{ error: string | null }> {
     const now = new Date().toISOString();
-    const { error } = await this.supabase.client.from('user_quizzes').insert({
+    const { error } = await this.supabase.client.from('quizzes').insert({
       id: crypto.randomUUID(),
       title: draft.title,
       category: draft.category ?? null,
       device_id: this.playerIdentity.getDeviceId(),
+      is_user_quiz: true,
       created_at: now,
       updated_at: now,
       questions: draft.questions,
@@ -75,7 +76,7 @@ export class UserQuizService {
 
   async update(id: string, draft: QuizDraft): Promise<{ error: string | null }> {
     const { error } = await this.supabase.client
-      .from('user_quizzes')
+      .from('quizzes')
       .update({
         title: draft.title,
         category: draft.category ?? null,
@@ -92,7 +93,7 @@ export class UserQuizService {
   }
 
   async delete(id: string): Promise<{ error: string | null }> {
-    const { error } = await this.supabase.client.from('user_quizzes').delete().eq('id', id);
+    const { error } = await this.supabase.client.from('quizzes').delete().eq('id', id);
 
     if (error) {
       return { error: error.message };
@@ -105,8 +106,9 @@ export class UserQuizService {
     this.loadingSignal.set(true);
 
     const { data, error } = await this.supabase.client
-      .from('user_quizzes')
+      .from('quizzes')
       .select('id, title, category, device_id, created_at, updated_at, questions')
+      .eq('is_user_quiz', true)
       .order('created_at', { ascending: false });
 
     if (error) {

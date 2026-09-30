@@ -8,8 +8,11 @@ const draft: QuizDraft = {
   questions: [{ id: 'q1', type: 'boolean', text: 'Czy to działa?', correct: true }],
 };
 
-/** In-memory stand-in for the `user_quizzes` table, chainable like the real client. */
-function provideSupabaseStub() {
+/**
+ * In-memory stand-in for the merged `quizzes` table, chainable like the real
+ * client. Pass `captured` to inspect the rows sent to `insert`.
+ */
+function provideSupabaseStub(captured?: { inserts: Record<string, unknown>[] }) {
   let rows: Record<string, unknown>[] = [];
 
   return {
@@ -18,16 +21,19 @@ function provideSupabaseStub() {
       client: {
         from: () => ({
           select: () => ({
-            order: () =>
-              Promise.resolve({
-                data: [...rows].sort((a, b) =>
-                  String(b['created_at']).localeCompare(String(a['created_at'])),
-                ),
-                error: null,
-              }),
+            eq: () => ({
+              order: () =>
+                Promise.resolve({
+                  data: [...rows].sort((a, b) =>
+                    String(b['created_at']).localeCompare(String(a['created_at'])),
+                  ),
+                  error: null,
+                }),
+            }),
           }),
           insert: (row: Record<string, unknown>) => {
             rows.push(row);
+            captured?.inserts.push(row);
             return Promise.resolve({ error: null });
           },
           update: (patch: Record<string, unknown>) => ({
@@ -62,6 +68,17 @@ describe('UserQuizService', () => {
     expect(error).toBeNull();
     expect(service.getAll()().length).toBe(1);
     expect(service.getAll()()[0].title).toBe('Mój quiz');
+  });
+
+  it('flags a created quiz as a user quiz (is_user_quiz = true)', async () => {
+    const captured = { inserts: [] as Record<string, unknown>[] };
+    TestBed.configureTestingModule({ providers: [provideSupabaseStub(captured)] });
+    const service = TestBed.inject(UserQuizService);
+
+    await service.create(draft);
+
+    expect(captured.inserts.length).toBe(1);
+    expect(captured.inserts[0]['is_user_quiz']).toBe(true);
   });
 
   it('marks a freshly created quiz as mine', async () => {
