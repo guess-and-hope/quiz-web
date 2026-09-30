@@ -45,7 +45,19 @@
             @if (quiz.category) {
               <span [class]="categoryClass(quiz)">{{ quiz.category }}</span>
             }
-            <p class="quiz-card__count">{{ quiz.questions.length }} pytań</p>
+          </div>
+          <div class="quiz-card__meta">
+            <p class="quiz-card__count">{{ questionCountLabel(quiz.questions.length) }}</p>
+            <div class="quiz-card__stats">
+              <span class="quiz-card__stat" title="Polubienia">
+                <app-category-icon icon="thumb_up" />
+                {{ likesFor(quiz.id) }}
+              </span>
+              <span class="quiz-card__stat" title="Liczba rozwiązań">
+                <app-category-icon icon="groups" />
+                {{ solvesFor(quiz.id) }}
+              </span>
+            </div>
           </div>
           <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">
             Rozwiąż
@@ -101,7 +113,19 @@
             @if (quiz.category) {
               <span [class]="categoryClass(quiz)">{{ quiz.category }}</span>
             }
-            <p class="quiz-card__count">{{ quiz.questions.length }} pytań</p>
+          </div>
+          <div class="quiz-card__meta">
+            <p class="quiz-card__count">{{ questionCountLabel(quiz.questions.length) }}</p>
+            <div class="quiz-card__stats">
+              <span class="quiz-card__stat" title="Polubienia">
+                <app-category-icon icon="thumb_up" />
+                {{ likesFor(quiz.id) }}
+              </span>
+              <span class="quiz-card__stat" title="Liczba rozwiązań">
+                <app-category-icon icon="groups" />
+                {{ solvesFor(quiz.id) }}
+              </span>
+            </div>
           </div>
           <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">
             Rozwiąż

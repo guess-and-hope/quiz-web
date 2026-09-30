@@ -45,7 +45,7 @@
             @if (quiz.category) {
               <span [class]="categoryClass(quiz)">{{ quiz.category }}</span>
             }
-            <p class="quiz-card__count">{{ quiz.questions.length }} pytań</p>
+            <p class="quiz-card__count">{{ questionCountLabel(quiz.questions.length) }}</p>
           </div>
           <div class="my-quizzes__actions">
             <button type="button" class="quiz-card__action" (click)="solve(quiz.id)">Rozwiąż</button>

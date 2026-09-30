@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserQuizService } from '../../services/user-quiz.service';
 import { Quiz, categoryColor } from '../../models';
+import { questionsLabel } from '../../shared/pluralize-pl';
 
 @Component({
   selector: 'app-my-quizzes',
@@ -49,5 +50,9 @@ export class MyQuizzes {
 
   protected categoryClass(quiz: Quiz): string {
     return `quiz-card__category quiz-card__category--${categoryColor(quiz.category) ?? 'auto'}`;
+  }
+
+  protected questionCountLabel(count: number): string {
+    return questionsLabel(count);
   }
 }

@@ -91,6 +91,30 @@ export class FeedbackService {
     return { comments, error: null };
   }
 
+  /** Number of thumbs-up ratings ("likes") per quiz, for the given quiz ids. */
+  async getLikeCounts(quizIds: string[]): Promise<Record<string, number>> {
+    if (quizIds.length === 0) {
+      return {};
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('quiz_ratings')
+      .select('quiz_id')
+      .in('quiz_id', quizIds)
+      .eq('rating', 1);
+
+    if (error) {
+      return {};
+    }
+
+    const counts: Record<string, number> = {};
+    for (const row of (data ?? []) as { quiz_id: string }[]) {
+      counts[row.quiz_id] = (counts[row.quiz_id] ?? 0) + 1;
+    }
+
+    return counts;
+  }
+
   async addComment(
     quizId: string,
     deviceId: string,

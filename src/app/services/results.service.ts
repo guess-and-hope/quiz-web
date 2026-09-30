@@ -105,4 +105,39 @@ export class ResultsService {
 
     return { entries, error: null };
   }
+
+  /**
+   * Number of distinct players who solved each quiz, for the given quiz ids.
+   * Deduplicated by `device_id`, falling back to nickname when it's missing,
+   * same as `topForQuiz`.
+   */
+  async getSolveCounts(quizIds: string[]): Promise<Record<string, number>> {
+    if (quizIds.length === 0) {
+      return {};
+    }
+
+    const { data, error } = await this.supabase.client
+      .from('results')
+      .select('quiz_id, device_id, player_name')
+      .in('quiz_id', quizIds);
+
+    if (error) {
+      return {};
+    }
+
+    const seen = new Set<string>();
+    const counts: Record<string, number> = {};
+    for (const row of (data ?? []) as Array<
+      Pick<ResultsRow, 'device_id' | 'player_name'> & { quiz_id: string }
+    >) {
+      const identity = `${row.quiz_id}:${row.device_id ?? `name:${row.player_name}`}`;
+      if (seen.has(identity)) {
+        continue;
+      }
+      seen.add(identity);
+      counts[row.quiz_id] = (counts[row.quiz_id] ?? 0) + 1;
+    }
+
+    return counts;
+  }
 }
