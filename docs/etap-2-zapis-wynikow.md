@@ -103,10 +103,18 @@ NIEZNANY NICK                         ZNANY NICK
 
 **W bazie (Supabase, tabela `results`) — dane rankingu:**
 
-- istniejące: `quiz_id`, `quiz_title`, `player_name`, `correct`, `total`,
-  `percentage`, `created_at`;
-- **do dodania (dla wariantu D):** `device_id` (uuid) — pozwala oznaczyć „moje" wpisy
-  i ograniczyć edycję/usuwanie do własnych.
+- `quiz_id`, `quiz_title`, `player_name`, `correct`, `total`, `percentage`,
+  `created_at`, `duration_seconds`;
+- `device_id` (uuid) — pozwala oznaczyć „moje" wpisy i ograniczyć edycję/usuwanie
+  do własnych;
+- `on_leaderboard` (boolean) — czy wynik trafia na listę high score (ranking).
+
+> **Aktualizacja modelu zapisu:** **każde** ukończenie quizu zapisuje wiersz w
+> `results` (mamy `device_id`, więc nawet bez podanego nicku), z flagą
+> `on_leaderboard = false`. Dopiero świadomy zapis z nickiem ustawia
+> `on_leaderboard = true` i pojawia się w rankingu. Dzięki temu **licznik
+> rozwiązań** (`getSolveCounts`) liczy wszystkie podejścia, a **ranking**
+> (`topForQuiz`) pokazuje tylko wpisy z high score.
 
 > `deviceId` to losowy identyfikator urządzenia/przeglądarki, **nie dane osobowe** —
 > nie łączy się z tożsamością gracza, dopóki sam nie poda nicka.
@@ -117,9 +125,12 @@ NIEZNANY NICK                         ZNANY NICK
 
 ### 5.1 Auto-zapis czy jedno kliknięcie?
 
-- **Jedno kliknięcie** (rekomendacja): gracz świadomie decyduje, że chce trafić na
-  ranking; unika przypadkowych/śmieciowych wpisów.
-- **Auto-zapis**: zero klikania, ale zapisuje też słabe/testowe podejścia.
+**Rozstrzygnięte — jedno i drugie, rozdzielone flagą `on_leaderboard`:**
+
+- **Auto-zapis** każdego ukończenia (anonimowo, `on_leaderboard = false`) — żeby
+  licznik rozwiązań odzwierciedlał wszystkie podejścia, nie tylko te „nazwane".
+- **Jedno kliknięcie** „Zapisz w rankingu" (z nickiem, `on_leaderboard = true`) —
+  świadoma decyzja gracza, że chce trafić na listę high score.
 
 ### 5.2 Które wyniki pokazywać na rankingu?
 

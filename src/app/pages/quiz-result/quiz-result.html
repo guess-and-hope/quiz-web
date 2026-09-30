@@ -49,12 +49,13 @@
 
         <div class="quiz-result__save">
           @if (saved()) {
-            <p class="quiz-result__save-confirm">Zapisano jako <strong>{{ playerName() }}</strong> ✓</p>
+            <p class="quiz-result__save-confirm">Zapisano w rankingu jako <strong>{{ playerName() }}</strong> ✓</p>
             <a class="quiz-result__ranking-link" [routerLink]="['/quiz', quiz.id, 'ranking']">
               Zobacz ranking →
             </a>
           } @else if (editingName()) {
             <div class="quiz-result__save-form">
+              <p class="quiz-result__save-hint">Podaj nick, aby trafić do rankingu tego quizu.</p>
               <input
                 type="text"
                 class="quiz-result__name-input"
@@ -69,7 +70,7 @@
                 [disabled]="!nameDraft().trim() || saving()"
                 (click)="saveResult()"
               >
-                {{ saving() ? 'Zapisywanie…' : 'Zapisz wynik' }}
+                {{ saving() ? 'Zapisywanie…' : 'Zapisz w rankingu' }}
               </button>
             </div>
           } @else {
@@ -81,7 +82,7 @@
                 [disabled]="saving()"
                 (click)="saveResult()"
               >
-                {{ saving() ? 'Zapisywanie…' : 'Zapisz wynik' }}
+                {{ saving() ? 'Zapisywanie…' : 'Zapisz w rankingu' }}
               </button>
               <button type="button" class="quiz-result__change-name" (click)="startEditingName()">
                 to nie Ty? zmień

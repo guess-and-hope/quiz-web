@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { QuizResult } from './quiz-result';
 import { AttemptService } from '../../services/attempt.service';
 import { FeedbackService } from '../../services/feedback.service';
+import { QuizResultInput, ResultsService } from '../../services/results.service';
 import { Quiz } from '../../models';
 import { provideQuizServiceStub } from '../../testing/quiz-service.stub';
 import { provideUserQuizServiceStub } from '../../testing/user-quiz-service.stub';
@@ -12,6 +13,14 @@ const feedbackServiceStub = {
   getComments: async () => ({ comments: [], error: null }),
   setRating: async () => ({ error: null }),
   addComment: async () => ({ error: null }),
+};
+
+let savedResults: QuizResultInput[] = [];
+const resultsServiceStub = {
+  save: async (result: QuizResultInput) => {
+    savedResults.push(result);
+    return { error: null };
+  },
 };
 
 const quiz: Quiz = {
@@ -41,6 +50,7 @@ function createFixture() {
 describe('QuizResult', () => {
   beforeEach(async () => {
     localStorage.clear();
+    savedResults = [];
     await TestBed.configureTestingModule({
       imports: [QuizResult],
       providers: [
@@ -48,6 +58,7 @@ describe('QuizResult', () => {
         provideQuizServiceStub([quiz]),
         provideUserQuizServiceStub(),
         { provide: FeedbackService, useValue: feedbackServiceStub },
+        { provide: ResultsService, useValue: resultsServiceStub },
       ],
     }).compileComponents();
   });
@@ -71,6 +82,52 @@ describe('QuizResult', () => {
     expect(text).toContain('1 / 2 — 50%');
     expect(text).toContain('Bo tak.');
     expect(text).toContain('Poprawna odpowiedź: Prawda');
+  });
+
+  it('records the completion automatically, off the leaderboard, even without a nickname', async () => {
+    TestBed.inject(AttemptService).submit('geografia', { q1: 0, q2: false });
+
+    const fixture = createFixture();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(savedResults.length).toBe(1);
+    expect(savedResults[0].onLeaderboard).toBe(false);
+    expect(savedResults[0].playerName).toBe('');
+    expect(savedResults[0].correct).toBe(1);
+  });
+
+  it('does not record anything when there is no attempt', async () => {
+    const fixture = createFixture();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(savedResults.length).toBe(0);
+  });
+
+  it('saves a named score onto the leaderboard when the player clicks save', async () => {
+    TestBed.inject(AttemptService).submit('geografia', { q1: 0, q2: false });
+
+    const fixture = createFixture();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    const nameInput = el.querySelector('.quiz-result__name-input') as HTMLInputElement;
+    nameInput.value = 'Kuba';
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const saveBtn = Array.from(el.querySelectorAll('button')).find(
+      (b) => b.textContent?.trim() === 'Zapisz w rankingu',
+    ) as HTMLButtonElement;
+    saveBtn.click();
+    await fixture.whenStable();
+
+    const leaderboard = savedResults.filter((r) => r.onLeaderboard);
+    expect(leaderboard.length).toBe(1);
+    expect(leaderboard[0].playerName).toBe('Kuba');
   });
 
   it('lets the player rate the quiz with a thumbs up and highlights the choice', async () => {
