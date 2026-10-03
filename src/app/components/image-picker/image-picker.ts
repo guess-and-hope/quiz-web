@@ -22,6 +22,18 @@ export class ImagePicker {
   protected readonly searched = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  // Tracks the url of an attached image that failed to load (e.g. an expired
+  // Pixabay link) so the preview can be hidden instead of showing a broken-image icon.
+  private readonly failedImageUrl = signal<string | null>(null);
+
+  protected imageFailed(url: string): boolean {
+    return this.failedImageUrl() === url;
+  }
+
+  protected onImageError(url: string): void {
+    this.failedImageUrl.set(url);
+  }
+
   protected openPanel(): void {
     this.panelOpen.set(true);
   }

@@ -6,12 +6,14 @@
     }
   </div>
   @if (question().image; as img) {
-    <div class="question-image">
-      <img [src]="img.url" alt="" />
-      <a class="question-image__credit" [href]="img.sourceUrl" target="_blank" rel="noopener">
-        Foto: {{ img.photographer }} / Pixabay
-      </a>
-    </div>
+    @if (!imageFailed(img.url)) {
+      <div class="question-image">
+        <img [src]="img.url" alt="" (error)="onImageError(img.url)" />
+        <a class="question-image__credit" [href]="img.sourceUrl" target="_blank" rel="noopener">
+          Foto: {{ img.photographer }} / Pixabay
+        </a>
+      </div>
+    }
   }
   <p class="quiz-question__text">{{ question().text }}</p>
 

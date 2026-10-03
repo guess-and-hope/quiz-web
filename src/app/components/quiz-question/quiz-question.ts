@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { AnswerValue, Question } from '../../models';
 
 @Component({
@@ -12,6 +12,18 @@ export class QuizQuestion {
   readonly answer = input<AnswerValue | undefined>(undefined);
   readonly progress = input('');
   readonly answerChange = output<AnswerValue>();
+
+  // Tracks the url of an image that failed to load (e.g. an expired Pixabay
+  // link) so it can be hidden instead of showing the browser's broken-image icon.
+  private readonly failedImageUrl = signal<string | null>(null);
+
+  protected imageFailed(url: string): boolean {
+    return this.failedImageUrl() === url;
+  }
+
+  protected onImageError(url: string): void {
+    this.failedImageUrl.set(url);
+  }
 
   protected readonly options = computed(() => {
     const question = this.question();
