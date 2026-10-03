@@ -1,11 +1,13 @@
 <div class="image-picker">
   @if (image(); as img) {
-    <div class="question-image">
-      <img [src]="img.url" alt="" />
-      <a class="question-image__credit" [href]="img.sourceUrl" target="_blank" rel="noopener">
-        Foto: {{ img.photographer }} / Pixabay
-      </a>
-    </div>
+    @if (!imageFailed(img.url)) {
+      <div class="question-image">
+        <img [src]="img.url" alt="" (error)="onImageError(img.url)" />
+        <a class="question-image__credit" [href]="img.sourceUrl" target="_blank" rel="noopener">
+          Foto: {{ img.photographer }} / Pixabay
+        </a>
+      </div>
+    }
     <div class="image-picker__actions">
       <button type="button" class="image-picker__action" (click)="openPanel()">
         Zmień zdjęcie
